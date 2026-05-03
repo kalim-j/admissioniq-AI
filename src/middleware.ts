@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import { NextResponse, NextRequest } from 'next/server';
 
 // Note: Firebase Client SDK doesn't work directly in Middleware easily without admin SDK or session cookies.
 // However, we can do a basic check for a 'session' cookie if we set one, or handle it on the client side in layouts.
