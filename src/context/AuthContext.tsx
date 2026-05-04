@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -35,8 +35,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Create initial profile if it doesn't exist
         const initialProfile: StudentProfile = {
           uid,
-          fullName: user?.displayName || '',
-          email: user?.email || '',
+          fullName: auth.currentUser?.displayName || '',
+          email: auth.currentUser?.email || '',
           createdAt: new Date(),
         };
         await setDoc(docRef, initialProfile);
@@ -54,10 +54,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
-        await fetchProfile(user.uid);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      if (firebaseUser) {
+        await fetchProfile(firebaseUser.uid);
       } else {
         setProfile(null);
       }
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []); // Run on mount only
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, refreshProfile }}>

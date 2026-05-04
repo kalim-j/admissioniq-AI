@@ -1,12 +1,24 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, Search, Sparkles, History, Phone, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
+
   const features = [
     {
       title: "AI Analysis",
@@ -42,6 +54,8 @@ export default function Home() {
     hidden: { y: 20, opacity: 0 },
     show: { y: 0, opacity: 1 },
   };
+
+  if (loading) return null;
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">

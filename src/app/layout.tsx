@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext";
+import Providers from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={cn(jakarta.variable, "min-h-screen font-sans antialiased bg-background")}>
-        <AuthProvider>
+        <Providers>
           <div className="relative flex min-h-screen flex-col">
             <Navbar />
             <main className="flex-1">
@@ -43,7 +43,7 @@ export default function RootLayout({
             </footer>
           </div>
           <Toaster position="top-center" richColors />
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );
