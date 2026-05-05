@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://eduanalytics-ai.vercel.app',
   },
+  verification: {
+    google: '3FzK2uEANXU1UxcCAAfgeX8axs3N4oSq-2slO34BnCU',
+  },
 };
 
 export default function RootLayout({
