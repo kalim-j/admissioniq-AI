@@ -28,6 +28,7 @@ export interface StudentProfile {
   cutoffRange?: '-10' | 'exact' | '+10';
   budget?: 'Government' | 'Private' | 'Both';
   quota?: string;
+  phone?: string;
   createdAt: any;
 }
 
@@ -44,6 +45,7 @@ export interface College {
   ranking: string;
   naac_grade: string;
   contact_url: string;
+  officialWebsite?: string;
 }
 
 export interface InterviewSession {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
 import { auth } from "@/lib/firebase";
@@ -43,8 +43,12 @@ export function Navbar() {
   ];
 
   const filteredLinks = navLinks.filter(link => {
-    if (link.protected) return !!user;
-    return true;
+    if (user) {
+      // Logged in: Hide 'How it works' and 'Features'
+      return link.protected || link.name === "Contact";
+    }
+    // Logged out: Hide protected links (Dashboard, History, Profile)
+    return !link.protected;
   });
 
   return (

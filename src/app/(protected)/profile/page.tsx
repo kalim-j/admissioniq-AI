@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { db } from "@/lib/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "sonner";
-import { Camera, Save, User, MapPin, Award, BookOpen } from "lucide-react";
+import { Camera, Save, User, MapPin, Award, BookOpen, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 
@@ -22,6 +22,7 @@ export default function ProfilePage() {
     district: "",
     stream: "",
     courseLevel: "UG" as "UG" | "PG",
+    phone: "",
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -39,6 +40,7 @@ export default function ProfilePage() {
         district: profile.district || "",
         stream: profile.stream || "",
         courseLevel: (profile.courseLevel as "UG" | "PG") || "UG",
+        phone: profile.phone || "",
       });
     }
   }, [profile, user, loading, router]);
@@ -190,6 +192,19 @@ export default function ProfilePage() {
                       onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                       className="h-12 rounded-xl bg-muted/30 border-none"
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                      <Phone className="h-4 w-4" /> Phone Number
+                    </label>
+                    <Input
+                      type="tel"
+                      placeholder="+91 9876543210"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="h-12 rounded-xl bg-muted/30 border-none"
+                    />
+                    <p className="text-[10px] text-muted-foreground font-medium italic">Used for college match notifications via SMS</p>
                   </div>
                 </div>
 

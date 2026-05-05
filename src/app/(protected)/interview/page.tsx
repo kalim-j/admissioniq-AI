@@ -64,6 +64,29 @@ export default function InterviewPage() {
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
+  const handleCollegeClick = async (college: College) => {
+    // Send notification (Email + SMS)
+    try {
+      await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          collegeName: college.name,
+          collegeLocation: college.location,
+          matchScore: college.match_score,
+          userEmail: user?.email,
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to send notification:", error);
+    }
+
+    // Navigate to college detail page
+    // Using a slug-friendly version of the name or an ID if available
+    const collegeId = college.name.toLowerCase().replace(/ /g, "-");
+    router.push(`/colleges/${collegeId}`);
+  };
+
   const handleFinish = async () => {
     setAnalyzing(true);
     try {
@@ -342,12 +365,14 @@ export default function InterviewPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
+                  onClick={() => handleCollegeClick(college)}
+                  className="cursor-pointer group"
                 >
-                  <Card className="college-card-glow rounded-3xl border-primary/10 shadow-lg hover:shadow-xl transition-all h-full overflow-hidden flex flex-col">
+                  <Card className="college-card-glow rounded-3xl border-primary/10 shadow-lg group-hover:shadow-2xl group-hover:border-primary/30 transition-all h-full overflow-hidden flex flex-col bg-white/40 backdrop-blur-md">
                     <CardContent className="p-6 flex-1">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-xl font-bold text-primary">{college.name}</h3>
+                          <h3 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors">{college.name}</h3>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="inline-flex items-center rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-bold text-secondary">
                               <MapPin className="h-3 w-3 mr-1" /> {college.location}, {college.state}
@@ -399,10 +424,18 @@ export default function InterviewPage() {
                           />
                         </div>
                         <div className="flex gap-2">
-                          <Link href={college.contact_url} target="_blank" className="flex-1">
-                            <Button variant="outline" size="sm" className="w-full rounded-xl">View Details</Button>
-                          </Link>
-                          <Link href="/contact" className="flex-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCollegeClick(college);
+                            }}
+                          >
+                            View Details
+                          </Button>
+                          <Link href="/contact" className="flex-1" onClick={(e) => e.stopPropagation()}>
                             <Button size="sm" className="w-full rounded-xl">Contact Admission</Button>
                           </Link>
                         </div>
