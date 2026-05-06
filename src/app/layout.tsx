@@ -13,24 +13,24 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'EduAnalytics-AI | Your Dream College Awaits',
-  description: 'AI-powered education analytics to help Indian students find their dream college based on marks, stream, and interests.',
-  keywords: 'EduAnalytics AI, college predictor India, AI college finder, Tamil Nadu college, CBSE college match, education analytics',
+  title: 'AdmissionIQ — AI College Predictor India',
+  description: 'AI-powered college predictor for Indian students',
+  keywords: 'AdmissionIQ, college predictor India, AI college finder, Tamil Nadu college, CBSE college match, education analytics',
   openGraph: {
-    title: 'EduAnalytics-AI | Your Dream College Awaits',
+    title: 'AdmissionIQ — AI College Predictor India',
     description: 'Find your perfect college match using AI. Supports CBSE, ICSE, and State Board students.',
-    url: 'https://eduanalytics-ai.vercel.app',
-    siteName: 'EduAnalytics-AI',
+    url: 'https://admissioniq.vercel.app',
+    siteName: 'AdmissionIQ',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'EduAnalytics-AI | Your Dream College Awaits',
+    title: 'AdmissionIQ — AI College Predictor India',
     description: 'AI-powered college finder for Indian students.',
   },
-  metadataBase: new URL('https://eduanalytics-ai.vercel.app'),
+  metadataBase: new URL('https://admissioniq.vercel.app'),
   alternates: {
-    canonical: 'https://eduanalytics-ai.vercel.app',
+    canonical: 'https://admissioniq.vercel.app',
   },
   verification: {
     google: '3FzK2uEANXU1UxcCAAfgeX8axs3N4oSq-2slO34BnCU',
@@ -57,7 +57,7 @@ export default function RootLayout({
             <footer className="border-t py-6 md:py-0">
               <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row px-4">
                 <p className="text-sm text-muted-foreground">
-                  &copy; {new Date().getFullYear()} EduAnalytics-AI. All rights reserved.
+                  &copy; {new Date().getFullYear()} AdmissionIQ. All rights reserved.
                 </p>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="font-medium text-primary">Inspiring ambition since 2024</span>
