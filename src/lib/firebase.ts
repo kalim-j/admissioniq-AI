@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Polyfill localStorage for Server-Side Rendering
@@ -15,6 +15,7 @@ if (typeof window === 'undefined') {
   };
 }
 
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "placeholder",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "placeholder",
@@ -27,10 +28,15 @@ const firebaseConfig = {
 // Initialize Firebase App
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize services
+// Initialize Firestore with a fix for Node.js GRPC errors
+export const db = typeof window === 'undefined' 
+  ? initializeFirestore(app, { experimentalForceLongPolling: true })
+  : getFirestore(app);
+
+// Initialize other services
 export const auth = getAuth(app);
-export const db = getFirestore(app);
 export const storage = getStorage(app);
+
 
 
 
