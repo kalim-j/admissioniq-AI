@@ -103,9 +103,7 @@ export default function SessionDetail() {
                     <BookOpen className="h-4 w-4 mr-2 text-primary" /> Top Courses
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {college.course ? (
-                      <Badge variant="outline" className="rounded-lg">{college.course}</Badge>
-                    ) : college.courses && college.courses.slice(0, 3).map(c => (
+                    {college.courses && college.courses.slice(0, 3).map(c => (
                       <Badge key={c} variant="outline" className="rounded-lg">{c}</Badge>
                     ))}
                   </div>
@@ -115,7 +113,7 @@ export default function SessionDetail() {
                     <BarChart className="h-4 w-4 mr-2 text-primary" /> Admission Metrics
                   </h4>
                   <p className="text-lg font-bold text-gray-900">
-                    Rank: #{college.nirf_rank || 'N/A'} {college.avg_package_lpa ? `| Avg: ${college.avg_package_lpa}L` : ''}
+                    Rank: #{college.nirf_rank} | NAAC: {college.naac_grade}
                   </p>
                 </div>
               </div>

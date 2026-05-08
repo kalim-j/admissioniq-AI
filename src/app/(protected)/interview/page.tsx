@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { generatePDFReport } from '@/lib/generateReport';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -356,6 +357,29 @@ export default function InterviewPage() {
               <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="text-3xl font-bold">Great Choice!</h2>
               <p className="text-muted-foreground mt-2">Here are colleges that believe in students like you.</p>
+              
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={() => generatePDFReport({
+                    studentName: profile?.fullName || 'Student',
+                    marks: formData.cutoffMark || 0,
+                    category: formData.quota || 'General',
+                    course: formData.stream || 'Any',
+                    aiSummary: `Based on your academic profile with ${formData.cutoffMark} marks in ${formData.stream}, we have analyzed ${colleges.length} colleges that best match your preferences. We recommend focusing on colleges with higher match scores for better admission probability.`,
+                    safeColleges: colleges.filter(c => (c.match_score || 0) > 80),
+                    moderateColleges: colleges.filter(c => (c.match_score || 0) > 60 && (c.match_score || 0) <= 80),
+                    reachColleges: colleges.filter(c => (c.match_score || 0) <= 60),
+                  })}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold text-sm hover:opacity-90 hover:scale-[1.02] transition-all duration-200"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Download PDF Report
+                </button>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -392,19 +416,18 @@ export default function InterviewPage() {
 
                       <div className="flex flex-wrap gap-2 mb-6">
                         <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.type}</span>
-                        {college.level && <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.level}</span>}
-                        {college.avg_package_lpa && <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-600 text-[10px] font-bold uppercase">Avg: {college.avg_package_lpa}L</span>}
-                        <span className="px-2 py-1 rounded-md bg-secondary/10 text-secondary text-[10px] font-bold uppercase">NIRF: #{college.nirf_rank}</span>
+                        <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.level}</span>
+                        <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase">NAAC: {college.naac_grade}</span>
+                        <span className="px-2 py-1 rounded-md bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Rank: {college.nirf_rank}</span>
                       </div>
 
                       <div className="mb-6">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Recommended Course</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Available Courses</p>
                         <div className="flex flex-wrap gap-1.5">
-                          {college.course ? (
-                            <span className="px-2 py-1 rounded-lg bg-muted/50 text-[10px]">{college.course}</span>
-                          ) : college.courses && college.courses.slice(0, 4).map(c => (
+                          {college.courses.slice(0, 4).map(c => (
                             <span key={c} className="px-2 py-1 rounded-lg bg-muted/50 text-[10px]">{c}</span>
                           ))}
+                          {college.courses.length > 4 && <span className="text-[10px] text-muted-foreground">+{college.courses.length - 4} more</span>}
                         </div>
                       </div>
 

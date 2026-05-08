@@ -21,7 +21,7 @@ interface CollegeResult {
   match_score: number;
   why_fit: string;
   naac_grade: string;
-  ranking: string;
+  nirf_rank: number;
 }
 
 interface Session {
@@ -199,7 +199,7 @@ export default function HistoryPage() {
                     {college.location} · {college.type} · NAAC: {college.naac_grade}
                   </p>
                   <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}>
-                    Cutoff: {college.cutoff_mark} · Rank: {college.ranking}
+                    Cutoff: {college.cutoff_mark} · Rank: {college.nirf_rank}
                   </p>
                   <p style={{ fontSize: '12px', fontStyle: 'italic', color: '#6B7280', marginBottom: '6px' }}>
                     "{college.why_fit}"

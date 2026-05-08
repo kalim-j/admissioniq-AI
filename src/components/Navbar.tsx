@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { GraduationCap, LayoutDashboard, History, User, Phone, LogOut, Menu, X, Zap, Sparkles } from "lucide-react";
+import { GraduationCap, LayoutDashboard, History, User, Phone, LogOut, Menu, X, Zap, Sparkles, ArrowLeftRight, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -37,6 +37,8 @@ export function Navbar() {
     { name: "How it works", id: "how-it-works", icon: Sparkles, protected: false },
     { name: "Features", id: "features", icon: Zap, protected: false },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, protected: true },
+    { name: "Compare", href: "/dashboard/compare", icon: ArrowLeftRight, protected: true },
+    { name: "Trends", href: "/dashboard/trends", icon: TrendingUp, protected: true },
     { name: "History", href: "/history", icon: History, protected: true },
     { name: "Contact", href: "/contact", icon: Phone, protected: false },
     { name: "Profile", href: "/profile", icon: User, protected: true },
