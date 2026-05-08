@@ -416,20 +416,21 @@ export default function InterviewPage() {
 
                       <div className="flex flex-wrap gap-2 mb-6">
                         <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.type}</span>
-                        <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.level}</span>
-                        <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase">NAAC: {college.naac_grade}</span>
-                        <span className="px-2 py-1 rounded-md bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Rank: {college.nirf_rank}</span>
+                        <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.level || "UG"}</span>
+                        <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase">NAAC: {college.naac_grade || "N/A"}</span>
+                        <span className="px-2 py-1 rounded-md bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Rank: {college.nirf_rank || "N/A"}</span>
                       </div>
 
                       <div className="mb-6">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Available Courses</p>
                         <div className="flex flex-wrap gap-1.5">
-                          {college.courses.slice(0, 4).map(c => (
+                          {(college.courses || [college.course]).slice(0, 4).map(c => (
                             <span key={c} className="px-2 py-1 rounded-lg bg-muted/50 text-[10px]">{c}</span>
                           ))}
-                          {college.courses.length > 4 && <span className="text-[10px] text-muted-foreground">+{college.courses.length - 4} more</span>}
+                          {(college.courses?.length || 0) > 4 && <span className="text-[10px] text-muted-foreground">+{(college.courses?.length || 0) - 4} more</span>}
                         </div>
                       </div>
+
 
                       <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 mb-6 italic text-sm text-primary/80">
                         "{college.why_fit}"
