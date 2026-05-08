@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { GraduationCap, Mail, Lock, User } from "lucide-react";
 import { motion } from "framer-motion";
 import LoginBackground from "@/components/LoginBackground";
+import { supabase } from "@/lib/supabase";
+
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -51,18 +53,20 @@ export default function RegisterPage() {
   const handleVerifyAndRegister = async () => {
     setVerifying(true);
     try {
-      // Fetch OTP from Firestore
-      const { getDoc, doc } = await import("firebase/firestore");
-      const otpDoc = await getDoc(doc(db, "otps", email));
+      // Fetch OTP from Supabase
+      const { data, error } = await supabase
+        .from('otps')
+        .select('*')
+        .eq('email', email)
+        .single();
       
-      if (!otpDoc.exists()) {
+      if (error || !data) {
         toast.error("No code found. Please resend.");
         return;
       }
 
-      const data = otpDoc.data();
       const now = new Date();
-      const expiresAt = data.expiresAt.toDate();
+      const expiresAt = new Date(data.expires_at);
 
       if (otpInput !== data.code) {
         toast.error("Invalid verification code!");
@@ -75,6 +79,7 @@ export default function RegisterPage() {
       }
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
 
       const user = userCredential.user;
       

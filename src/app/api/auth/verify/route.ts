@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { db } from '@/lib/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -19,23 +18,27 @@ export async function POST(req: NextRequest) {
     const otp = generateOTP();
     console.log("Generated OTP:", otp);
 
-    // ── STORE OTP IN FIRESTORE ──
+    // ── STORE OTP IN SUPABASE ──
     try {
-      console.log("Storing OTP in Firestore...");
-      await setDoc(doc(db, 'otps', email), {
-        code: otp,
-        createdAt: serverTimestamp(),
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000)
-      });
-      console.log("Firestore storage successful");
+      console.log("Storing OTP in Supabase...");
+      const { error: dbError } = await supabase
+        .from('otps')
+        .upsert({ 
+          email, 
+          code: otp, 
+          expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString() 
+        });
+
+      if (dbError) throw dbError;
+      console.log("Supabase storage successful");
     } catch (dbError: any) {
-      console.error("Firestore Error:", dbError);
+      console.error("Supabase Error:", dbError);
       return NextResponse.json({ success: false, error: "Database error: " + dbError.message }, { status: 500 });
     }
 
     // ── SEND EMAIL ──
     try {
-      console.log("Initializing Nodemailer...");
+      console.log("Sending email via Gmail...");
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -44,7 +47,6 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      console.log("Sending email via Gmail...");
       await transporter.sendMail({
         from: `"AdmissionIQ Verification" <${process.env.EMAIL_USER}>`,
         to: email,
@@ -73,5 +75,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
 
 

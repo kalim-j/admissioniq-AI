@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { GraduationCap, Mail, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import LoginBackground from "@/components/LoginBackground";
+import { supabase } from "@/lib/supabase";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -54,19 +56,20 @@ export default function LoginPage() {
   const handleVerifyAndLogin = async () => {
     setVerifying(true);
     try {
-      // Fetch OTP from Firestore
-      const { getDoc, doc } = await import("firebase/firestore");
-      const { db } = await import("@/lib/firebase");
-      const otpDoc = await getDoc(doc(db, "otps", email));
+      // Fetch OTP from Supabase
+      const { data, error } = await supabase
+        .from('otps')
+        .select('*')
+        .eq('email', email)
+        .single();
       
-      if (!otpDoc.exists()) {
+      if (error || !data) {
         toast.error("No code found. Please resend.");
         return;
       }
 
-      const data = otpDoc.data();
       const now = new Date();
-      const expiresAt = data.expiresAt.toDate();
+      const expiresAt = new Date(data.expires_at);
 
       if (otpInput !== data.code) {
         toast.error("Invalid verification code!");
@@ -86,6 +89,7 @@ export default function LoginPage() {
       setVerifying(false);
     }
   };
+
 
 
 
