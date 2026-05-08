@@ -29,7 +29,6 @@ export const metadata: Metadata = {
     "college finder india ai",
     "collegematch",
     "admission iq",
-    "admissioniq",
     "college search ai india",
     "tnea college predictor",
     "eamcet college predictor",

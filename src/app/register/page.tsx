@@ -141,7 +141,7 @@ export default function RegisterPage() {
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-2xl mb-6 font-bold text-2xl"
           >
-            IQ
+            CM
           </motion.div>
           <h1 className="text-4xl font-bold tracking-tight text-white mb-2">Create Account</h1>
           <p className="text-white/70">Join us to find your perfect college match</p>

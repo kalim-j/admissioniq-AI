@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-1">
             <h3 className="text-2xl font-bold text-white mb-4">
-              AdmissionIQ
+              CollegeMatch
             </h3>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Empowering students with AI-driven insights to find their perfect college match in India. Your future, our expertise.
@@ -58,7 +58,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} AdmissionIQ. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} CollegeMatch. All rights reserved.</p>
           <p className="font-medium text-primary/80">Inspiring ambition since 2024</p>
         </div>
       </div>

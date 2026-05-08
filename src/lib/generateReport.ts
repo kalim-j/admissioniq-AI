@@ -40,7 +40,7 @@ export const generatePDFReport = async (data: ReportData) => {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text('AdmissionIQ', 20, 25);
+  doc.text('CollegeMatch', 20, 25);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -131,12 +131,12 @@ export const generatePDFReport = async (data: ReportData) => {
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text(
-      `AdmissionIQ — admissioniq-app.vercel.app — Page ${i} of ${pageCount}`,
+      `CollegeMatch — collegematch-ai.vercel.app — Page ${i} of ${pageCount}`,
       pageWidth / 2,
       doc.internal.pageSize.getHeight() - 10,
       { align: 'center' }
     );
   }
 
-  doc.save(`AdmissionIQ_Report_${data.studentName}_${Date.now()}.pdf`);
+  doc.save(`CollegeMatch_Report_${data.studentName}_${Date.now()}.pdf`);
 };
