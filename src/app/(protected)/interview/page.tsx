@@ -267,7 +267,7 @@ export default function InterviewPage() {
                             type="number" 
                             className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
                             value={formData.marks10th}
-                            onChange={(e) => updateForm({ marks10th: e.target.value })}
+                            onChange={(e) => updateForm({ marks10th: Number(e.target.value) })}
                             placeholder="e.g. 480"
                         />
                     </div>
@@ -277,7 +277,7 @@ export default function InterviewPage() {
                             type="number" 
                             className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
                             value={formData.percentage10th}
-                            onChange={(e) => updateForm({ percentage10th: e.target.value })}
+                            onChange={(e) => updateForm({ percentage10th: Number(e.target.value) })}
                             placeholder="96"
                         />
                     </div>
@@ -324,7 +324,7 @@ export default function InterviewPage() {
                             type="number" 
                             className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
                             value={formData.marks12th}
-                            onChange={(e) => updateForm({ marks12th: e.target.value })}
+                            onChange={(e) => updateForm({ marks12th: Number(e.target.value) })}
                             placeholder="e.g. 580"
                         />
                     </div>
@@ -334,7 +334,7 @@ export default function InterviewPage() {
                             type="number" 
                             className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
                             value={formData.percentage12th}
-                            onChange={(e) => updateForm({ percentage12th: e.target.value })}
+                            onChange={(e) => updateForm({ percentage12th: Number(e.target.value) })}
                             placeholder="97"
                         />
                     </div>
@@ -365,7 +365,7 @@ export default function InterviewPage() {
                             step="0.01"
                             className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
                             value={formData.ugCgpa}
-                            onChange={(e) => updateForm({ ugCgpa: e.target.value })}
+                            onChange={(e) => updateForm({ ugCgpa: Number(e.target.value) })}
                             placeholder="8.5"
                         />
                     </div>
@@ -377,7 +377,7 @@ export default function InterviewPage() {
                             step="0.01"
                             className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
                             value={formData.cutoffMark}
-                            onChange={(e) => updateForm({ cutoffMark: e.target.value })}
+                            onChange={(e) => updateForm({ cutoffMark: Number(e.target.value) })}
                             placeholder="e.g. 185.5"
                         />
                     </div>
