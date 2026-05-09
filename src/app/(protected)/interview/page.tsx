@@ -148,10 +148,10 @@ export default function InterviewPage() {
                   whileHover={{ scale: 1.02, translateY: -5 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "cursor-pointer transition-all border-2 rounded-[3.5rem] p-12 text-center relative overflow-hidden group",
+                    "cursor-pointer transition-all border-2 rounded-[3.5rem] p-12 text-center relative overflow-hidden group backdrop-blur-xl",
                     formData.courseLevel === level 
                         ? "border-purple-500 bg-purple-500/10 shadow-[0_20px_50px_rgba(124,92,252,0.2)]" 
-                        : "border-white/5 bg-[#111520] hover:border-white/20"
+                        : "border-white/5 bg-white/5 hover:border-white/20"
                   )}
                   onClick={() => { updateForm({ courseLevel: level as any }); handleNext(); }}
                 >
@@ -203,7 +203,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Location</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 3: Residency details</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 space-y-8 shadow-2xl">
                 <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">State</label>
                     <select 
@@ -211,7 +211,7 @@ export default function InterviewPage() {
                         value={formData.state}
                         onChange={(e) => updateForm({ state: e.target.value, district: "" })}
                     >
-                        {Object.keys(stateDistricts).map(s => <option key={s} value={s} className="bg-[#111520]">{s}</option>)}
+                        {Object.keys(stateDistricts).map(s => <option key={s} value={s} className="bg-[#0a0d14]">{s}</option>)}
                     </select>
                 </div>
                 <div className="space-y-4">
@@ -221,8 +221,8 @@ export default function InterviewPage() {
                         value={formData.district}
                         onChange={(e) => updateForm({ district: e.target.value })}
                     >
-                        <option value="" className="bg-[#111520]">Select District</option>
-                        {(stateDistricts[formData.state!] || []).map(d => <option key={d} value={d} className="bg-[#111520]">{d}</option>)}
+                        <option value="" className="bg-[#0a0d14]">Select District</option>
+                        {(stateDistricts[formData.state!] || []).map(d => <option key={d} value={d} className="bg-[#0a0d14]">{d}</option>)}
                     </select>
                 </div>
                 <button 
@@ -242,7 +242,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">10th Standard</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 4: Primary education</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 space-y-8 shadow-2xl">
                 <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Board of Education</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -299,7 +299,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">12th Standard</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 5: Higher secondary</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 space-y-8 shadow-2xl">
                 <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Board of Education</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -356,7 +356,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Further Details</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 6: Additional performance</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 space-y-8 shadow-2xl">
                 {formData.courseLevel === "PG" ? (
                     <div className="space-y-4">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">UG CGPA (Out of 10)</label>
@@ -421,7 +421,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Background</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 7: Social details</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 space-y-8 shadow-2xl">
                 <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Caste / Category</label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -472,7 +472,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Budget</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 8: Financial preference</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 space-y-8 shadow-2xl">
                 <div className="grid grid-cols-1 gap-4">
                     {["Government", "Private", "Both"].map((b) => (
                         <button
@@ -497,7 +497,7 @@ export default function InterviewPage() {
                 <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Ready?</h2>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 9: Final analysis</p>
             </div>
-            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-emerald-500" />
                 <Sparkles className="h-20 w-20 text-purple-500 mx-auto animate-pulse" />
                 <div className="space-y-2">
@@ -563,7 +563,7 @@ export default function InterviewPage() {
                   onClick={() => handleCollegeClick(college)}
                   className="cursor-pointer group"
                 >
-                  <div className="bg-[#111520] border border-white/5 rounded-[2.5rem] p-8 hover:border-purple-500/30 transition-all relative overflow-hidden h-full flex flex-col group shadow-2xl">
+                  <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 hover:border-purple-500/30 transition-all relative overflow-hidden h-full flex flex-col group shadow-2xl">
                     <div className="absolute top-0 right-0 p-8 opacity-[0.03] rotate-12 pointer-events-none">
                         <GraduationCap size={160} className="text-purple-500" />
                     </div>
@@ -641,7 +641,14 @@ export default function InterviewPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
+    <div className="min-h-screen bg-[#0a0d14] text-white overflow-hidden relative selection:bg-purple-500/30">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 blur-[120px] rounded-full animate-pulse" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
       {step < 10 && (
         <div className="mb-20">
           <div className="flex justify-between items-center mb-8">
