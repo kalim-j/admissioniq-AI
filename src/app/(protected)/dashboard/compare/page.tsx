@@ -198,7 +198,7 @@ Be specific, practical, and use numbers.`;
                 onChange={(e) => setFilters({...filters, state: e.target.value})}
                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
               >
-                {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                {STATES.map(s => <option key={s} value={s} className="bg-[#0a0d14] text-white">{s}</option>)}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
             </div>
@@ -211,7 +211,7 @@ Be specific, practical, and use numbers.`;
                 onChange={(e) => setFilters({...filters, type: e.target.value})}
                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
               >
-                {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                {TYPES.map(t => <option key={t} value={t} className="bg-[#0a0d14] text-white">{t}</option>)}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
             </div>
@@ -224,7 +224,7 @@ Be specific, practical, and use numbers.`;
                 onChange={(e) => setFilters({...filters, exam: e.target.value})}
                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
               >
-                {EXAMS.map(x => <option key={x} value={x}>{x}</option>)}
+                {EXAMS.map(x => <option key={x} value={x} className="bg-[#0a0d14] text-white">{x}</option>)}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
             </div>
@@ -237,7 +237,7 @@ Be specific, practical, and use numbers.`;
                 onChange={(e) => setFilters({...filters, sort: e.target.value})}
                 className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
               >
-                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-[#0a0d14] text-white">{o.label}</option>)}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
             </div>

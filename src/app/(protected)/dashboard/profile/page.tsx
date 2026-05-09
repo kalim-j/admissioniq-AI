@@ -179,12 +179,12 @@ export default function ProfilePage() {
                             onChange={(e) => setProfile({...profile, preferredCourse: e.target.value})}
                             className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all font-bold appearance-none cursor-pointer"
                         >
-                            <option value="Computer Science">Computer Science (CSE)</option>
-                            <option value="Information Technology">Information Technology (IT)</option>
-                            <option value="Electronics & Communication">ECE</option>
-                            <option value="Mechanical">Mechanical</option>
-                            <option value="Civil">Civil</option>
-                            <option value="Electrical">Electrical (EEE)</option>
+                            <option value="Computer Science" className="bg-[#0a0d14] text-white">Computer Science (CSE)</option>
+                            <option value="Information Technology" className="bg-[#0a0d14] text-white">Information Technology (IT)</option>
+                            <option value="Electronics & Communication" className="bg-[#0a0d14] text-white">ECE</option>
+                            <option value="Mechanical" className="bg-[#0a0d14] text-white">Mechanical</option>
+                            <option value="Civil" className="bg-[#0a0d14] text-white">Civil</option>
+                            <option value="Electrical" className="bg-[#0a0d14] text-white">Electrical (EEE)</option>
                         </select>
                     </div>
                 </div>

@@ -103,11 +103,11 @@ export default function ContactPage() {
                         onChange={(e) => setFormData({...formData, subject: e.target.value})}
                         className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-6 text-white font-bold outline-none focus:border-purple-500 appearance-none cursor-pointer"
                     >
-                        <option>General Inquiry</option>
-                        <option>Direct Admission Help</option>
-                        <option>JEE/TNEA Counseling</option>
-                        <option>Bug Report</option>
-                        <option>Other</option>
+                        <option className="bg-[#0a0d14] text-white">General Inquiry</option>
+                        <option className="bg-[#0a0d14] text-white">Direct Admission Help</option>
+                        <option className="bg-[#0a0d14] text-white">JEE/TNEA Counseling</option>
+                        <option className="bg-[#0a0d14] text-white">Bug Report</option>
+                        <option className="bg-[#0a0d14] text-white">Other</option>
                     </select>
                 </div>
 

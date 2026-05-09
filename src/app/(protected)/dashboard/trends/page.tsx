@@ -197,7 +197,7 @@ export default function TrendsPage() {
                         onChange={(e) => setFilters({...filters, state: e.target.value})}
                         className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white outline-none focus:border-purple-500 appearance-none font-bold cursor-pointer"
                     >
-                        {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                        {STATES.map(s => <option key={s} value={s} className="bg-[#0a0d14] text-white">{s}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" />
                 </div>
@@ -210,7 +210,7 @@ export default function TrendsPage() {
                         onChange={(e) => setFilters({...filters, type: e.target.value})}
                         className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white outline-none focus:border-purple-500 appearance-none font-bold cursor-pointer"
                     >
-                        {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        {TYPES.map(t => <option key={t} value={t} className="bg-[#0a0d14] text-white">{t}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" />
                 </div>
@@ -223,7 +223,7 @@ export default function TrendsPage() {
                         onChange={(e) => setFilters({...filters, yearRange: e.target.value})}
                         className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-6 text-white outline-none focus:border-purple-500 appearance-none font-bold cursor-pointer"
                     >
-                        {YEAR_RANGES.map(y => <option key={y} value={y}>{y}</option>)}
+                        {YEAR_RANGES.map(y => <option key={y} value={y} className="bg-[#0a0d14] text-white">{y}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" />
                 </div>
