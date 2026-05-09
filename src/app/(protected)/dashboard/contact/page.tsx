@@ -10,10 +10,15 @@ export default function ContactPage() {
   const [profile, setProfile] = useState<any>(null);
   const [sending, setSending] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     subject: "General Inquiry",
     message: ""
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
 
   useEffect(() => {
@@ -142,7 +147,7 @@ export default function ContactPage() {
               className="bg-[#111520] border border-white/10 rounded-[3.5rem] p-20 text-center space-y-8 shadow-[0_48px_120px_rgba(0,0,0,0.6)] relative overflow-hidden"
             >
                 <div className="absolute inset-0 pointer-events-none">
-                    {[...Array(20)].map((_, i) => (
+                    {mounted && [...Array(20)].map((_, i) => (
                         <motion.div
                             key={i}
                             className="absolute h-2 w-2 rounded-full bg-purple-500"

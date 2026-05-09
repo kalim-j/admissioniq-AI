@@ -17,8 +17,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +110,7 @@ export default function LoginPage() {
 
       {/* Floating Orbs */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        {[...Array(5)].map((_, i) => (
+        {mounted && [...Array(5)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full blur-[120px] mix-blend-screen opacity-20"
