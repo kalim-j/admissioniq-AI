@@ -124,12 +124,11 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-end">
                         <button 
-                            onClick={handlePredict}
-                            disabled={predicting}
+                            onClick={() => router.push("/interview")}
                             className="w-full h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl text-white font-black text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3"
                         >
-                            {predicting ? <Loader2 className="animate-spin" /> : <Sparkles size={20} />}
-                            {predicting ? "Analyzing..." : "Find My Colleges"}
+                            <Sparkles size={20} />
+                            Start Full Analysis
                         </button>
                     </div>
                 </div>

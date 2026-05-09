@@ -43,11 +43,15 @@ export async function POST(req: Request) {
     - Stream: ${studentProfile.stream}
     - State: ${studentProfile.state}
     - District: ${studentProfile.district}
+    - 10th Board: ${studentProfile.marks10thBoard}
     - 10th%: ${studentProfile.percentage10th}%
+    - 12th Board: ${studentProfile.marks12thBoard}
     - 12th%: ${studentProfile.percentage12th}%
-    - Cutoff: ${studentProfile.cutoffMark}
+    - UG CGPA: ${studentProfile.ugCgpa || 'N/A'}
+    - Entrance Cutoff: ${studentProfile.cutoffMark}
     - Budget: ${studentProfile.budget}
-    - Quota: ${studentProfile.quota}
+    - Quota/Caste: ${studentProfile.quota}
+    - Religion: ${studentProfile.religion}
     `;
 
     const completion = await groq.chat.completions.create({

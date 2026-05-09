@@ -21,7 +21,9 @@ import Link from "next/link";
 
 const UG_STREAMS = ["Engineering", "Medical", "Arts & Science", "Commerce", "Law", "Agriculture", "Architecture", "Pharmacy", "Nursing", "Education", "Hotel Management", "Design", "MBA (Integrated)", "Other"];
 const PG_STREAMS = ["ME/MTech", "MD/MS", "MSc", "MA", "MBA", "MCA", "LLM", "MPharm", "MEd", "Other"];
-const QUOTAS = ["BC", "MBC", "OC", "SC/ST", "NRI", "Management", "Sports", "None"];
+const QUOTAS = ["General", "OBC", "MBC", "BC", "SC", "ST", "NRI", "Management"];
+const RELIGIONS = ["Hindu", "Muslim", "Christian", "Sikh", "Jain", "Other"];
+const BOARDS = ["State Board", "CBSE", "ICSE", "IGCSE", "Other"];
 
 export default function InterviewPage() {
   const { user, profile, loading } = useAuth();
@@ -29,20 +31,23 @@ export default function InterviewPage() {
   const [step, setStep] = useState(1);
   const totalSteps = 9;
   
-  const [formData, setFormData] = useState<Partial<StudentProfile>>({
+  const [formData, setFormData] = useState<any>({
     courseLevel: "UG",
     stream: "",
     state: "Tamil Nadu",
     district: "",
-    marks10thBoard: "",
-    marks10th: 0,
-    percentage10th: 0,
-    marks12th: 0,
-    percentage12th: 0,
-    cutoffMark: 0,
+    marks10thBoard: "State Board",
+    marks10th: "",
+    percentage10th: "",
+    marks12thBoard: "State Board",
+    marks12th: "",
+    percentage12th: "",
+    ugCgpa: "",
+    cutoffMark: "",
     cutoffRange: "exact",
     budget: "Both",
-    quota: "None",
+    quota: "General",
+    religion: "Hindu"
   });
 
   const [colleges, setColleges] = useState<College[]>([]);
@@ -100,38 +105,22 @@ export default function InterviewPage() {
       if (!res.ok) throw new Error("Groq API call failed");
       const collegesData = await res.json();
 
-      // Save to Firestore from frontend as requested
-      const auth = getAuth();
-      const uid = auth.currentUser?.uid;
-
-      if (uid && Array.isArray(collegesData) && collegesData.length > 0) {
-        await addDoc(collection(db, "interviews", uid, "sessions"), {
+      if (user && Array.isArray(collegesData) && collegesData.length > 0) {
+        await addDoc(collection(db, "interviews", user.uid, "sessions"), {
           timestamp: serverTimestamp(),
           createdAt: new Date().toISOString(),
-          studentProfile: {
-            level: formData.courseLevel,           // UG or PG
-            stream: formData.stream,
-            state: formData.state,
-            district: formData.district,
-            marks10: formData.marks10th,
-            marks12: formData.marks12th,
-            cutoffMark: formData.cutoffMark,
-            cutoffRange: formData.cutoffRange,
-            budget: formData.budget,
-            quota: formData.quota,
-          },
+          studentProfile: formData,
           results: collegesData,
           topCollege: collegesData[0]?.name ?? 'Unknown',
           totalResults: collegesData.length,
         });
       }
 
-      // Store results in sessionStorage as requested
       sessionStorage.setItem('eduanalytics_results', JSON.stringify(collegesData));
       sessionStorage.setItem('eduanalytics_profile', JSON.stringify(formData));
 
       setColleges(collegesData);
-      setStep(10); // Show results step
+      setStep(10); 
       toast.success("AI Analysis Complete!");
     } catch (error: any) {
       console.error("EduAnalytics error:", error);
@@ -147,22 +136,36 @@ export default function InterviewPage() {
     switch (step) {
       case 1:
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center mb-8">Select your Course Level</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Academic Path</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 1: Your target educational level</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {["UG", "PG"].map((level) => (
-                <Card 
+                <motion.div 
                   key={level}
+                  whileHover={{ scale: 1.02, translateY: -5 }}
+                  whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "cursor-pointer transition-all border-2 rounded-3xl p-8 text-center hover:shadow-xl",
-                    formData.courseLevel === level ? "border-primary bg-primary/5 shadow-lg" : "border-transparent"
+                    "cursor-pointer transition-all border-2 rounded-[3.5rem] p-12 text-center relative overflow-hidden group",
+                    formData.courseLevel === level 
+                        ? "border-purple-500 bg-purple-500/10 shadow-[0_20px_50px_rgba(124,92,252,0.2)]" 
+                        : "border-white/5 bg-[#111520] hover:border-white/20"
                   )}
                   onClick={() => { updateForm({ courseLevel: level as any }); handleNext(); }}
                 >
-                  <GraduationCap className={cn("h-12 w-12 mx-auto mb-4", formData.courseLevel === level ? "text-primary" : "text-muted-foreground")} />
-                  <h3 className="text-2xl font-bold">{level}</h3>
-                  <p className="text-muted-foreground">{level === "UG" ? "Undergraduate (After 12th)" : "Postgraduate (After Degree)"}</p>
-                </Card>
+                  <div className={cn(
+                      "h-20 w-20 rounded-3xl mx-auto mb-8 flex items-center justify-center transition-all",
+                      formData.courseLevel === level ? "bg-purple-500 text-white" : "bg-white/5 text-slate-500 group-hover:bg-white/10"
+                  )}>
+                    <GraduationCap size={40} />
+                  </div>
+                  <h3 className="text-3xl font-black text-white mb-2">{level}</h3>
+                  <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">
+                    {level === "UG" ? "Undergraduate / Degree" : "Postgraduate / Master"}
+                  </p>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -170,219 +173,387 @@ export default function InterviewPage() {
       case 2:
         const streams = formData.courseLevel === "UG" ? UG_STREAMS : PG_STREAMS;
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center mb-8">Select your Stream</h2>
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Your Stream</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 2: Field of study</p>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {streams.map((stream) => (
-                <Button
+                <button
                   key={stream}
-                  variant={formData.stream === stream ? "default" : "outline"}
-                  className="h-auto py-4 rounded-2xl text-sm whitespace-normal"
+                  className={cn(
+                    "h-16 rounded-2xl text-xs font-black uppercase tracking-widest transition-all px-4",
+                    formData.stream === stream 
+                        ? "bg-purple-500 text-white shadow-xl shadow-purple-500/20" 
+                        : "bg-white/5 text-slate-400 border border-white/5 hover:border-white/20"
+                  )}
                   onClick={() => { updateForm({ stream }); handleNext(); }}
                 >
                   {stream}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
         );
       case 3:
         return (
-          <div className="space-y-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-4">Which State are you from?</h2>
-            <select 
-              className="w-full p-4 rounded-2xl border bg-white shadow-sm focus:ring-2 focus:ring-primary outline-none"
-              value={formData.state}
-              onChange={(e) => updateForm({ state: e.target.value, district: "" })}
-            >
-              {Object.keys(stateDistricts).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <Button className="w-full rounded-xl h-12" onClick={handleNext} disabled={!formData.state}>Next</Button>
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Location</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 3: Residency details</p>
+            </div>
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">State</label>
+                    <select 
+                        className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-purple-500 appearance-none cursor-pointer"
+                        value={formData.state}
+                        onChange={(e) => updateForm({ state: e.target.value, district: "" })}
+                    >
+                        {Object.keys(stateDistricts).map(s => <option key={s} value={s} className="bg-[#111520]">{s}</option>)}
+                    </select>
+                </div>
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">District</label>
+                    <select 
+                        className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-purple-500 appearance-none cursor-pointer"
+                        value={formData.district}
+                        onChange={(e) => updateForm({ district: e.target.value })}
+                    >
+                        <option value="" className="bg-[#111520]">Select District</option>
+                        {(stateDistricts[formData.state!] || []).map(d => <option key={d} value={d} className="bg-[#111520]">{d}</option>)}
+                    </select>
+                </div>
+                <button 
+                    className="w-full h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl text-white font-black text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 transition-all flex items-center justify-center gap-2"
+                    onClick={handleNext} 
+                    disabled={!formData.district}
+                >
+                    Continue <ChevronRight size={20} />
+                </button>
+            </div>
           </div>
         );
       case 4:
-        const districts = stateDistricts[formData.state!] || [];
         return (
-          <div className="space-y-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-4">Select your District</h2>
-            <select 
-              className="w-full p-4 rounded-2xl border bg-white shadow-sm focus:ring-2 focus:ring-primary outline-none"
-              value={formData.district}
-              onChange={(e) => updateForm({ district: e.target.value })}
-            >
-              <option value="">Select District</option>
-              {districts.map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
-            <Button className="w-full rounded-xl h-12" onClick={handleNext} disabled={!formData.district}>Next</Button>
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">10th Standard</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 4: Primary education</p>
+            </div>
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Board of Education</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {BOARDS.map(b => (
+                            <button
+                                key={b}
+                                className={cn(
+                                    "h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    formData.marks10thBoard === b ? "bg-purple-500 text-white" : "bg-white/5 text-slate-400 border border-white/5"
+                                )}
+                                onClick={() => updateForm({ marks10thBoard: b })}
+                            >
+                                {b}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Total Marks</label>
+                        <input 
+                            type="number" 
+                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
+                            value={formData.marks10th}
+                            onChange={(e) => updateForm({ marks10th: e.target.value })}
+                            placeholder="e.g. 480"
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Percentage (%)</label>
+                        <input 
+                            type="number" 
+                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
+                            value={formData.percentage10th}
+                            onChange={(e) => updateForm({ percentage10th: e.target.value })}
+                            placeholder="96"
+                        />
+                    </div>
+                </div>
+                <button 
+                    className="w-full h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl text-white font-black text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 transition-all flex items-center justify-center gap-2"
+                    onClick={handleNext} 
+                    disabled={!formData.marks10th || !formData.percentage10th}
+                >
+                    Continue <ChevronRight size={20} />
+                </button>
+            </div>
           </div>
         );
       case 5:
-        const max10 = formData.marks10thBoard === "state" ? 1200 : 500;
         return (
-          <div className="space-y-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-4">10th Standard Marks</h2>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-muted-foreground uppercase">Select Board</label>
-              <select 
-                className="w-full p-4 rounded-2xl border bg-white shadow-sm focus:ring-2 focus:ring-primary outline-none"
-                value={formData.marks10thBoard || ""}
-                onChange={(e) => updateForm({ marks10thBoard: e.target.value, marks10th: 0, percentage10th: 0 })}
-              >
-                <option value="">-- Select Board --</option>
-                <option value="cbse">CBSE / ICSE (Out of 500)</option>
-                <option value="state">State Board - TN/AP/etc (Out of 1200)</option>
-              </select>
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">12th Standard</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 5: Higher secondary</p>
             </div>
-
-            {formData.marks10thBoard && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="text-sm font-bold text-muted-foreground uppercase">Total Marks (Out of {max10})</label>
-                <Input 
-                  type="number" 
-                  min={0}
-                  max={max10}
-                  className="h-14 rounded-2xl text-xl" 
-                  value={formData.marks10th || ""} 
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if (val > max10) return;
-                    updateForm({ marks10th: val, percentage10th: (val / max10) * 100 });
-                  }} 
-                />
-                <p className="text-center font-bold text-primary">Percentage: {formData.percentage10th?.toFixed(2)}%</p>
-                <Button className="w-full rounded-xl h-12" onClick={handleNext} disabled={!formData.marks10th}>Next</Button>
-              </div>
-            )}
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Board of Education</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {BOARDS.map(b => (
+                            <button
+                                key={b}
+                                className={cn(
+                                    "h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    formData.marks12thBoard === b ? "bg-purple-500 text-white" : "bg-white/5 text-slate-400 border border-white/5"
+                                )}
+                                onClick={() => updateForm({ marks12thBoard: b })}
+                            >
+                                {b}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Total Marks</label>
+                        <input 
+                            type="number" 
+                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
+                            value={formData.marks12th}
+                            onChange={(e) => updateForm({ marks12th: e.target.value })}
+                            placeholder="e.g. 580"
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Percentage (%)</label>
+                        <input 
+                            type="number" 
+                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
+                            value={formData.percentage12th}
+                            onChange={(e) => updateForm({ percentage12th: e.target.value })}
+                            placeholder="97"
+                        />
+                    </div>
+                </div>
+                <button 
+                    className="w-full h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl text-white font-black text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 transition-all flex items-center justify-center gap-2"
+                    onClick={handleNext} 
+                    disabled={!formData.marks12th || !formData.percentage12th}
+                >
+                    Continue <ChevronRight size={20} />
+                </button>
+            </div>
           </div>
         );
       case 6:
         return (
-          <div className="space-y-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-4">12th / HSC Marks</h2>
-            <div className="space-y-4">
-              <label className="text-sm font-bold text-muted-foreground uppercase">Overall Percentage (%)</label>
-              <Input 
-                type="number" 
-                className="h-14 rounded-2xl text-xl" 
-                value={formData.percentage12th || ""} 
-                onChange={(e) => updateForm({ percentage12th: Number(e.target.value) })} 
-              />
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Further Details</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 6: Additional performance</p>
             </div>
-            <Button className="w-full rounded-xl h-12" onClick={handleNext} disabled={!formData.percentage12th}>Next</Button>
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+                {formData.courseLevel === "PG" ? (
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">UG CGPA (Out of 10)</label>
+                        <input 
+                            type="number" 
+                            step="0.01"
+                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
+                            value={formData.ugCgpa}
+                            onChange={(e) => updateForm({ ugCgpa: e.target.value })}
+                            placeholder="8.5"
+                        />
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Cutoff Mark (Entrance)</label>
+                        <input 
+                            type="number" 
+                            step="0.01"
+                            className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white text-2xl font-black outline-none focus:border-purple-500"
+                            value={formData.cutoffMark}
+                            onChange={(e) => updateForm({ cutoffMark: e.target.value })}
+                            placeholder="e.g. 185.5"
+                        />
+                    </div>
+                )}
+                
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Cutoff Range Preference</label>
+                    <div className="grid grid-cols-3 gap-3">
+                        {[
+                            { val: "-10", label: "Safety", color: "bg-emerald-500" },
+                            { val: "exact", label: "Exact", color: "bg-purple-500" },
+                            { val: "+10", label: "Dream", color: "bg-amber-500" }
+                        ].map((r) => (
+                            <button
+                                key={r.val}
+                                className={cn(
+                                    "h-14 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    formData.cutoffRange === r.val ? `${r.color} text-white` : "bg-white/5 text-slate-400 border border-white/5"
+                                )}
+                                onClick={() => updateForm({ cutoffRange: r.val as any })}
+                            >
+                                {r.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <button 
+                    className="w-full h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl text-white font-black text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 transition-all flex items-center justify-center gap-2"
+                    onClick={handleNext} 
+                >
+                    Continue <ChevronRight size={20} />
+                </button>
+            </div>
           </div>
         );
       case 7:
         return (
-          <div className="space-y-8 max-w-lg mx-auto">
-            <h2 className="text-2xl font-bold text-center">Entrance Cutoff Mark</h2>
-            <div className="space-y-4">
-              <Input 
-                type="number" 
-                placeholder="e.g. 185.5"
-                className="h-14 rounded-2xl text-2xl text-center font-bold" 
-                value={formData.cutoffMark || ""} 
-                onChange={(e) => updateForm({ cutoffMark: Number(e.target.value) })} 
-              />
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Background</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 7: Social details</p>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { val: "-10", label: "-10 (Safety)", color: "bg-green-500", tip: "Comfortably above cutoff" },
-                { val: "exact", label: "Exact Match", color: "bg-[#534AB7]", tip: "Matching current marks" },
-                { val: "+10", label: "+10 (Dream)", color: "bg-amber-500", tip: "Aspirational colleges" }
-              ].map((r) => (
-                <button
-                  key={r.val}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-1",
-                    formData.cutoffRange === r.val ? `border-transparent ${r.color} text-white shadow-lg` : "border-muted bg-white text-muted-foreground"
-                  )}
-                  onClick={() => updateForm({ cutoffRange: r.val as any })}
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Caste / Category</label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {QUOTAS.map(q => (
+                            <button
+                                key={q}
+                                className={cn(
+                                    "h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    formData.quota === q ? "bg-purple-500 text-white" : "bg-white/5 text-slate-400 border border-white/5"
+                                )}
+                                onClick={() => updateForm({ quota: q })}
+                            >
+                                {q}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Religion</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {RELIGIONS.map(r => (
+                            <button
+                                key={r}
+                                className={cn(
+                                    "h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    formData.religion === r ? "bg-purple-500 text-white" : "bg-white/5 text-slate-400 border border-white/5"
+                                )}
+                                onClick={() => updateForm({ religion: r })}
+                            >
+                                {r}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <button 
+                    className="w-full h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl text-white font-black text-lg shadow-xl shadow-purple-500/20 hover:shadow-purple-500/40 transition-all flex items-center justify-center gap-2"
+                    onClick={handleNext} 
                 >
-                  <span className="font-bold text-xs">{r.label}</span>
-                  <span className="text-[10px] opacity-80 leading-tight">{r.tip}</span>
+                    Continue <ChevronRight size={20} />
                 </button>
-              ))}
             </div>
-            <Button className="w-full rounded-xl h-12" onClick={handleNext} disabled={!formData.cutoffMark}>Next</Button>
           </div>
         );
       case 8:
         return (
-          <div className="space-y-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-8">Budget Preference</h2>
-            <div className="grid grid-cols-1 gap-4">
-              {["Government", "Private", "Both"].map((b) => (
-                <Button
-                  key={b}
-                  variant={formData.budget === b ? "default" : "outline"}
-                  className="h-14 rounded-2xl text-lg font-bold"
-                  onClick={() => { updateForm({ budget: b as any }); handleNext(); }}
-                >
-                  {b}
-                </Button>
-              ))}
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Budget</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 8: Financial preference</p>
+            </div>
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 space-y-8">
+                <div className="grid grid-cols-1 gap-4">
+                    {["Government", "Private", "Both"].map((b) => (
+                        <button
+                        key={b}
+                        className={cn(
+                            "h-16 rounded-2xl text-xl font-black uppercase tracking-widest transition-all",
+                            formData.budget === b ? "bg-purple-500 text-white" : "bg-white/5 text-slate-400 border border-white/5"
+                        )}
+                        onClick={() => { updateForm({ budget: b as any }); handleNext(); }}
+                        >
+                        {b}
+                        </button>
+                    ))}
+                </div>
             </div>
           </div>
         );
       case 9:
         return (
-          <div className="space-y-6 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-8">Special Quota</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {QUOTAS.map((q) => (
-                <Button
-                  key={q}
-                  variant={formData.quota === q ? "default" : "outline"}
-                  className="h-12 rounded-xl"
-                  onClick={() => updateForm({ quota: q })}
-                >
-                  {q}
-                </Button>
-              ))}
+          <div className="space-y-12 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">Ready?</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Step 9: Final analysis</p>
             </div>
-            <Button 
-              className="w-full mt-8 rounded-2xl h-16 text-xl font-bold bg-[#1D9E75] hover:bg-[#1D9E75]/90 shadow-xl" 
-              onClick={handleFinish}
-              disabled={analyzing}
-            >
-              {analyzing ? "AI is Analyzing..." : "Find My Colleges"}
-            </Button>
+            <div className="bg-[#111520] border border-white/5 rounded-[3.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-emerald-500" />
+                <Sparkles className="h-20 w-20 text-purple-500 mx-auto animate-pulse" />
+                <div className="space-y-2">
+                    <h3 className="text-3xl font-black text-white">Analysis Ready</h3>
+                    <p className="text-slate-500 font-bold text-sm leading-relaxed max-w-xs mx-auto">
+                        Our CollegeMatch-AI is ready to process your academic profile and find your perfect matches.
+                    </p>
+                </div>
+                <button 
+                    className="w-full h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-3xl text-white font-black text-2xl shadow-2xl shadow-purple-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3" 
+                    onClick={handleFinish}
+                    disabled={analyzing}
+                >
+                    {analyzing ? <Loader2 className="animate-spin" size={32} /> : <Sparkles size={32} />}
+                    {analyzing ? "AI is Analyzing..." : "Find My Colleges"}
+                </button>
+            </div>
           </div>
         );
       case 10:
         return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-3xl font-bold">Great Choice!</h2>
-              <p className="text-muted-foreground mt-2">Here are colleges that believe in students like you.</p>
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+              <div className="h-20 w-20 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center text-emerald-400 mx-auto shadow-2xl border border-emerald-500/20 mb-6">
+                <Sparkles size={40} className="animate-pulse" />
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black text-white font-syne uppercase tracking-tighter">AI Match Analysis</h2>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-sm leading-relaxed max-w-lg mx-auto">
+                Based on your {formData.courseLevel} profile, we found <span className="text-purple-400">{colleges.length} matches</span> that best fit your criteria.
+              </p>
               
-              <div className="mt-6 flex justify-center">
+              <div className="mt-8 flex flex-col md:flex-row justify-center gap-4">
                 <button
                   onClick={() => generatePDFReport({
                     studentName: profile?.fullName || 'Student',
-                    marks: formData.cutoffMark || 0,
+                    marks: formData.cutoffMark || formData.ugCgpa || 0,
                     category: formData.quota || 'General',
                     course: formData.stream || 'Any',
-                    aiSummary: `Based on your academic profile with ${formData.cutoffMark} marks in ${formData.stream}, we have analyzed ${colleges.length} colleges that best match your preferences. We recommend focusing on colleges with higher match scores for better admission probability.`,
+                    aiSummary: `Based on your academic profile with ${formData.cutoffMark || formData.ugCgpa} scores in ${formData.stream}, we have analyzed ${colleges.length} colleges that best match your preferences. We recommend focusing on colleges with higher match scores for better admission probability.`,
                     safeColleges: colleges.filter(c => (c.match_score || 0) > 80),
                     moderateColleges: colleges.filter(c => (c.match_score || 0) > 60 && (c.match_score || 0) <= 80),
                     reachColleges: colleges.filter(c => (c.match_score || 0) <= 60),
                   })}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold text-sm hover:opacity-90 hover:scale-[1.02] transition-all duration-200"
+                  className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-emerald-400 font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:-translate-y-1 transition-all"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-5 h-5">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                   </svg>
-                  Download PDF Report
+                  Download Analysis Report (PDF)
                 </button>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
               {colleges.map((college, idx) => (
                 <motion.div
                   key={idx}
@@ -392,89 +563,75 @@ export default function InterviewPage() {
                   onClick={() => handleCollegeClick(college)}
                   className="cursor-pointer group"
                 >
-                  <Card className="college-card-glow rounded-2xl md:rounded-3xl border-primary/10 shadow-lg group-hover:shadow-2xl group-hover:border-primary/30 transition-all h-full overflow-hidden flex flex-col bg-white/40 backdrop-blur-md">
-                    <CardContent className="p-6 flex-1">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors">{college.name}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="inline-flex items-center rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-bold text-secondary">
-                              <MapPin className="h-3 w-3 mr-1" /> {college.location}, {college.state}
-                            </span>
+                  <div className="bg-[#111520] border border-white/5 rounded-[2.5rem] p-8 hover:border-purple-500/30 transition-all relative overflow-hidden h-full flex flex-col group shadow-2xl">
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] rotate-12 pointer-events-none">
+                        <GraduationCap size={160} className="text-purple-500" />
+                    </div>
+                    
+                    <div className="relative z-10 flex-1 flex flex-col">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="space-y-1">
+                          <h3 className="text-2xl font-black text-white group-hover:text-purple-400 transition-colors line-clamp-2">{college.name}</h3>
+                          <div className="flex items-center gap-2 text-slate-500">
+                             <MapPin size={14} className="text-purple-500" />
+                             <span className="text-[10px] font-black uppercase tracking-widest">{college.location}, {college.state}</span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Match</div>
+                        <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-3 text-center min-w-[70px]">
+                          <div className="text-[8px] font-black text-purple-400 uppercase tracking-widest mb-1">Match</div>
                           <div className={cn(
                             "text-xl font-black",
-                            college.match_score > 80 ? "text-green-500" : college.match_score > 60 ? "text-amber-500" : "text-red-500"
+                            college.match_score > 80 ? "text-emerald-400" : college.match_score > 60 ? "text-amber-400" : "text-red-400"
                           )}>
                             {college.match_score}%
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.type}</span>
-                        <span className="px-2 py-1 rounded-md bg-muted text-[10px] font-bold uppercase">{college.level || "UG"}</span>
-                        <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase">NAAC: {college.naac_grade || "N/A"}</span>
-                        <span className="px-2 py-1 rounded-md bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Rank: {college.nirf_rank || "N/A"}</span>
+                      <div className="flex flex-wrap gap-2 mb-8">
+                        <span className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-black text-slate-400 border border-white/5 uppercase">{college.type}</span>
+                        <span className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-black text-slate-400 border border-white/5 uppercase">{college.level || "UG"}</span>
+                        <span className="px-3 py-1 bg-emerald-500/10 rounded-lg text-[9px] font-black text-emerald-400 border border-emerald-500/10 uppercase">Rank #{college.nirf_rank || "N/A"}</span>
                       </div>
 
-                      <div className="mb-6">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase mb-2">Available Courses</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(college.courses || [college.course]).slice(0, 4).map(c => (
-                            <span key={c} className="px-2 py-1 rounded-lg bg-muted/50 text-[10px]">{c}</span>
-                          ))}
-                          {(college.courses?.length || 0) > 4 && <span className="text-[10px] text-muted-foreground">+{(college.courses?.length || 0) - 4} more</span>}
-                        </div>
-                      </div>
-
-
-                      <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 mb-6 italic text-sm text-primary/80">
-                        "{college.why_fit}"
+                      <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 mb-8 flex-1">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">AI Recommendation</p>
+                        <p className="text-slate-300 font-bold italic text-sm leading-relaxed">
+                            "{college.why_fit}"
+                        </p>
                       </div>
                       
-                      <div className="mt-auto space-y-3">
-                        <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${college.match_score}%` }}
-                            transition={{ duration: 1, delay: idx * 0.1 }}
-                            className={cn(
-                              "h-full",
-                              college.match_score > 80 ? "bg-green-500" : college.match_score > 60 ? "bg-amber-500" : "bg-red-500"
-                            )}
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1 rounded-xl"
+                      <div className="mt-auto pt-6 border-t border-white/5">
+                        <div className="flex gap-4">
+                          <button 
+                            className="flex-1 h-14 bg-white/5 border border-white/10 rounded-xl text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleCollegeClick(college);
                             }}
                           >
-                            View Details
-                          </Button>
-                          <Link href="/contact" className="flex-1" onClick={(e) => e.stopPropagation()}>
-                            <Button size="sm" className="w-full rounded-xl">Contact Admission</Button>
+                            Full Analysis
+                          </button>
+                          <Link href="/dashboard/contact" className="flex-1" onClick={(e) => e.stopPropagation()}>
+                            <button className="w-full h-14 bg-purple-500 rounded-xl text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-purple-500/20 hover:scale-[1.02] transition-all">
+                                Direct Admission
+                            </button>
                           </Link>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
             
             <div className="text-center py-12">
-              <Button size="lg" className="rounded-2xl px-12" onClick={() => router.push("/dashboard")}>
+              <button 
+                className="px-10 py-5 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+                onClick={() => router.push("/dashboard")}
+              >
                 Return to Dashboard
-              </Button>
+              </button>
             </div>
           </div>
         );
@@ -486,22 +643,33 @@ export default function InterviewPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       {step < 10 && (
-        <div className="mb-12">
-          <div className="flex justify-between items-center mb-4">
-            <Button variant="ghost" size="sm" onClick={handleBack} disabled={step === 1} className="rounded-xl">
-              <ChevronLeft className="h-4 w-4 mr-1" /> Back
-            </Button>
-            <span className="text-sm font-bold text-muted-foreground">Step {step} of {totalSteps}</span>
-            <Button variant="ghost" size="sm" onClick={handleNext} className="rounded-xl" disabled={step === totalSteps}>
-              Next <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
+        <div className="mb-20">
+          <div className="flex justify-between items-center mb-8">
+            <button 
+                onClick={handleBack} 
+                disabled={step === 1} 
+                className="flex items-center gap-2 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition-all disabled:opacity-0"
+            >
+              <ChevronLeft size={16} /> Back
+            </button>
+            <div className="flex flex-col items-center">
+                <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.3em] mb-1">Process</span>
+                <span className="text-white font-black text-sm">{step} / {totalSteps}</span>
+            </div>
+            <button 
+                onClick={handleNext} 
+                disabled={step === totalSteps}
+                className="flex items-center gap-2 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition-all disabled:opacity-0"
+            >
+              Next <ChevronRight size={16} />
+            </button>
           </div>
-          <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-primary"
+              className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
               initial={{ width: 0 }}
               animate={{ width: `${(step / totalSteps) * 100}%` }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.5, ease: "circOut" }}
             />
           </div>
         </div>

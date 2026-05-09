@@ -11,6 +11,7 @@ type College = {
   avg_package_lpa?: number;
   nirf_rank?: number;
   website?: string;
+  match_score?: number;
 };
 
 type ReportData = {
