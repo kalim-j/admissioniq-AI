@@ -3,20 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { auth } from "@/lib/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, Users, TrendingUp, MessageSquare, Settings, 
   Search, Download, ExternalLink, Activity, Clock, MapPin, 
   Calendar, Mail, User, LogOut, ChevronRight, Loader2
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, 
   CartesianGrid, Tooltip, ResponsiveContainer, Cell 
 } from "recharts";
 
 export default function AdminPage() {
+  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
-  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [usersList, setUsersList] = useState<any[]>([]);
@@ -27,18 +29,15 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session || session.user.email !== "kalimdon07@gmail.com") {
+    if (!authLoading) {
+      if (!user || user.email !== "kalimdon07@gmail.com") {
         router.push("/dashboard");
         return;
       }
-      setUser(session.user);
-      await fetchData();
+      fetchData();
       setLoading(false);
-    };
-    checkAdmin();
-  }, []);
+    }
+  }, [user, authLoading]);
 
   const fetchData = async () => {
     // 1. Fetch Stats via RPC
@@ -61,7 +60,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await auth.signOut();
     router.push("/login");
   };
 
