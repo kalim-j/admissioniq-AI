@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import ChatDrawer from "./ChatDrawer";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -30,5 +31,10 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <ChatDrawer />
+    </>
+  );
 }

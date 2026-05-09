@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
@@ -10,6 +10,18 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-jakarta",
   display: 'swap',
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -91,7 +103,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={cn(jakarta.variable, "min-h-screen font-sans antialiased")}>
+      <body className={cn(jakarta.variable, syne.variable, dmSans.variable, "min-h-screen font-sans antialiased")}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

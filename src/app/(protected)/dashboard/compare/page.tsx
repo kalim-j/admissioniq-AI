@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Sparkles, GraduationCap, Globe, Info, BrainCircuit, Loader2, Star } from "lucide-react";
+import { Search, X, Sparkles, GraduationCap, Globe, Info, BrainCircuit, Loader2, Star, Filter, ChevronDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 
 const GROQ_KEY   = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
 const GROQ_MODEL = "llama-3.3-70b-versatile";
-const CLG_API    = "https://colleges-api.onrender.com";
 
 type College = {
   id: string;
@@ -26,105 +25,125 @@ type College = {
   naac_grade?: string;
   type?: string;
   fees_approx?: string;
+  entrance_exam?: string;
+  established_year?: number;
+  seats?: number;
 };
 
-// ── tiny debounce hook ─────────────────────────────────────────
-function useDebounce<T>(val: T, ms: number = 400): T {
-  const [d, setD] = useState(val);
-  useEffect(() => { 
-    const t = setTimeout(() => setD(val), ms); 
-    return () => clearTimeout(t); 
-  }, [val, ms]);
-  return d;
-}
-
-// ── search colleges from Supabase/API ─────────────────────────────
-async function searchColleges(query: string): Promise<College[]> {
-  if (!query || query.trim().length < 2) return [];
-  
-  // 1. Try Supabase first
-  try {
-    const { data: sbData, error } = await supabase
-      .from('colleges')
-      .select('*')
-      .ilike('name', `%${query}%`)
-      .limit(10);
-    
-    if (!error && sbData && sbData.length > 0) {
-      return sbData.map(c => ({
-        id:      c.id.toString(),
-        name:    c.name,
-        state:   c.state,
-        city:    c.location,
-        address: c.location,
-        website: c.website,
-        nirf_rank: c.nirf_rank,
-        cutoff_general: c.cutoff_general,
-        avg_package_lpa: c.avg_package_lpa,
-        max_package_lpa: c.max_package_lpa,
-        naac_grade: c.naac_grade,
-        type: c.type,
-        fees_approx: c.fees_approx
-      }));
-    }
-  } catch (err) {
-    console.error("Supabase search error:", err);
-  }
-
-  // 2. Fallback to external API if Supabase fails or is empty
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-  try {
-    const url = `${CLG_API}/colleges?search=${encodeURIComponent(query.trim())}&limit=20`;
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
-    
-    if (!res.ok) return [];
-    const data = await res.json();
-    const list = Array.isArray(data) ? data : (data.colleges || []);
-    return list.map((c: any, i: number) => ({
-      id:      `${c.Name}-${i}`,
-      name:    c.Name    || c.name    || "Unknown",
-      state:   c.State   || c.state   || "",
-      city:    c.City    || c.city    || "",
-      address: [c.Address_line1, c.Address_line2].filter(Boolean).join(", "),
-    }));
-  } catch (err) {
-    console.error("External search error:", err);
-    return [];
-  }
-}
-
-const POPULAR_COLLEGES: College[] = [
-    { id: "p1", name: "IIT Madras", city: "Chennai", state: "Tamil Nadu", address: "Chennai", nirf_rank: 1, type: "Government" },
-    { id: "p2", name: "IIT Delhi", city: "New Delhi", state: "Delhi", address: "New Delhi", nirf_rank: 2, type: "Government" },
-    { id: "p3", name: "IIT Bombay", city: "Mumbai", state: "Maharashtra", address: "Mumbai", nirf_rank: 3, type: "Government" },
-    { id: "p4", name: "VIT Vellore", city: "Vellore", state: "Tamil Nadu", address: "Vellore", nirf_rank: 11, type: "Private" },
-    { id: "p5", name: "NIT Trichy", city: "Trichy", state: "Tamil Nadu", address: "Trichy", nirf_rank: 9, type: "Government" },
+const STATES = [
+  "All States", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Chandigarh", "Puducherry", "Jammu & Kashmir"
 ];
 
-// ── Groq AI comparison ─────────────────────────────────────────
-async function getAIComparison(colleges: College[]) {
-  if (!GROQ_KEY) return "⚠️ AI analysis currently unavailable. Please check your API configuration.";
+const TYPES = ["All Types", "Government", "Private", "Deemed", "Autonomous", "Central"];
 
-  const list = colleges.map((c, i) =>
-    `${i + 1}. ${c.name} — Location: ${c.city}, ${c.state}` +
-    (c.nirf_rank      ? ` | NIRF Rank: #${c.nirf_rank}`            : "") +
-    (c.cutoff_general ? ` | Cutoff (Gen): ${c.cutoff_general}%`     : "") +
-    (c.avg_package_lpa? ` | Avg Package: ${c.avg_package_lpa} LPA`  : "") +
-    (c.max_package_lpa? ` | Max Package: ${c.max_package_lpa} LPA`  : "") +
-    (c.naac_grade     ? ` | NAAC: ${c.naac_grade}`                  : "") +
-    (c.type           ? ` | Type: ${c.type}`                         : "")
-  ).join("\n");
+const EXAMS = ["All", "JEE Advanced", "JEE Main", "TNEA", "KEAM", "WBJEE", "TSEAMCET", "BITSAT", "GUJCET", "MHT-CET", "KCET", "State CET"];
 
-  const prompt = `You are an expert Indian engineering college counselor.
+const SORT_OPTIONS = [
+  { label: "NIRF Rank", value: "nirf_rank" },
+  { label: "Avg Package ↑", value: "avg_package_lpa" },
+  { label: "Cutoff Low→High", value: "cutoff_asc" },
+  { label: "Cutoff High→Low", value: "cutoff_desc" }
+];
 
-Compare these ${colleges.length} colleges for an Indian student choosing engineering:
+export default function ComparePage() {
+  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState({
+    state: "All States",
+    type: "All Types",
+    exam: "All",
+    sort: "nirf_rank"
+  });
+  const [results, setResults] = useState<College[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showDrop, setShowDrop] = useState(false);
+  const [selected, setSelected] = useState<College[]>([]);
+  const [aiText, setAiText] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiErr, setAiErr] = useState("");
 
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (query.length >= 2 || (query.length === 0 && showDrop)) {
+        performSearch();
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [query, filters]);
+
+  const performSearch = async () => {
+    setSearching(true);
+    try {
+      let q = supabase.from("colleges").select("*");
+      
+      if (filters.state !== "All States") q = q.eq("state", filters.state);
+      if (filters.type !== "All Types") q = q.eq("type", filters.type);
+      if (filters.exam !== "All") q = q.eq("entrance_exam", filters.exam);
+      if (query) q = q.ilike("name", `%${query}%`);
+
+      // Apply sorting
+      if (filters.sort === "nirf_rank") q = q.order("nirf_rank", { ascending: true, nullsFirst: false });
+      else if (filters.sort === "avg_package_lpa") q = q.order("avg_package_lpa", { ascending: false });
+      else if (filters.sort === "cutoff_asc") q = q.order("cutoff_general", { ascending: true });
+      else if (filters.sort === "cutoff_desc") q = q.order("cutoff_general", { ascending: false });
+
+      const { data, error } = await q.limit(20);
+      
+      if (!error && data) {
+        setResults(data.map(c => ({
+          ...c,
+          id: c.id.toString(),
+          city: c.location,
+          address: c.location
+        })));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const addCollege = (c: College) => {
+    if (selected.find(s => s.id === c.id)) return;
+    if (selected.length >= 3) {
+      toast.error("Max 3 colleges allowed for comparison");
+      return;
+    }
+    setSelected([...selected, c]);
+    setQuery("");
+    setShowDrop(false);
+  };
+
+  const removeCollege = (id: string) => {
+    setSelected(selected.filter(s => s.id !== id));
+  };
+
+  const handleCompare = async () => {
+    if (selected.length < 2) return;
+    setAiLoading(true);
+    setAiErr("");
+    setAiText("");
+
+    const list = selected.map((c, i) =>
+      `${i + 1}. ${c.name} — Location: ${c.city}, ${c.state}` +
+      (c.nirf_rank      ? ` | NIRF Rank: #${c.nirf_rank}`            : "") +
+      (c.cutoff_general ? ` | Cutoff: ${c.cutoff_general}%`          : "") +
+      (c.avg_package_lpa? ` | Avg Package: ${c.avg_package_lpa} LPA`  : "") +
+      (c.max_package_lpa? ` | Max Package: ${c.max_package_lpa} LPA`  : "") +
+      (c.fees_approx    ? ` | Fees/Year: ${c.fees_approx}`           : "") +
+      (c.entrance_exam  ? ` | Entrance: ${c.entrance_exam}`          : "") +
+      (c.established_year? ` | Est: ${c.established_year}`           : "") +
+      (c.seats          ? ` | Seats: ${c.seats}`                    : "") +
+      (c.naac_grade     ? ` | NAAC: ${c.naac_grade}`                : "")
+    ).join("\n");
+
+    const prompt = `You are an expert Indian engineering college counselor.
+Compare these ${selected.length} colleges for an Indian student:
 ${list}
 
-Give a DETAILED, HONEST comparison under these headings:
+Provide a DETAILED, HONEST comparison under these headings:
 🏆 Rankings & Reputation
 📚 Academics & Curriculum  
 💼 Placements & Salary Packages
@@ -133,105 +152,108 @@ Give a DETAILED, HONEST comparison under these headings:
 🎯 Who Should Choose Which College
 ✅ Final Verdict — Best overall pick and why
 
-Be specific and practical. Use numbers. Help the student make a clear decision.`;
+Be specific, practical, and use numbers.`;
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: GROQ_MODEL, max_tokens: 1500, temperature: 0.6,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-  if (!res.ok) { 
-    const e = await res.json().catch(()=>({})); 
-    throw new Error(e?.error?.message || `Groq error ${res.status}`); 
-  }
-  const d = await res.json();
-  return d.choices?.[0]?.message?.content || "No response.";
-}
-
-export default function ComparePage() {
-  const [query,     setQuery]     = useState("");
-  const [results,   setResults]   = useState<College[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [showDrop,  setShowDrop]  = useState(false);
-  const [selected,  setSelected]  = useState<College[]>([]);
-  const [aiText,    setAiText]    = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiErr,     setAiErr]     = useState("");
-  const inputRef  = useRef<HTMLInputElement>(null);
-  const debouncedQ = useDebounce(query, 400);
-
-  useEffect(() => {
-    if (debouncedQ.trim().length < 2) { setResults([]); return; }
-    setSearching(true);
-    searchColleges(debouncedQ)
-      .then(r => { 
-        setResults(r); 
-        setSearching(false); 
-        setShowDrop(true); 
-      })
-      .catch(() => {
-        setSearching(false);
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.2
+        })
       });
-  }, [debouncedQ]);
-
-  useEffect(() => {
-    const h = (e: MouseEvent) => { 
-      if (!(e.target as HTMLElement).closest("#cmp-search")) setShowDrop(false); 
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-
-  const addCollege = useCallback((c: College) => {
-    if (selected.length >= 3 || selected.find(s => s.name === c.name)) return;
-    setSelected(p => [...p, c]);
-    setQuery(""); 
-    setResults([]); 
-    setShowDrop(false);
-    setAiText(""); 
-    setAiErr("");
-  }, [selected]);
-
-  const removeCollege = (id: string) => { 
-    setSelected(p => p.filter(c => c.id !== id)); 
-    setAiText(""); 
-    setAiErr(""); 
-  };
-
-  const handleCompare = async () => {
-    setAiLoading(true); 
-    setAiText(""); 
-    setAiErr("");
-    try { 
-      const result = await getAIComparison(selected);
-      setAiText(result); 
+      const data = await res.json();
+      setAiText(data.choices[0].message.content);
+    } catch (err) {
+      setAiErr("Failed to generate AI comparison. Please try again.");
+    } finally {
+      setAiLoading(false);
     }
-    catch(e: any) { setAiErr(e.message); }
-    finally { setAiLoading(false); }
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-6xl min-h-screen">
-      <div className="mb-12 text-center md:text-left">
-        <h1 className="text-4xl font-black text-primary mb-3">College Comparison</h1>
-        <p className="text-muted-foreground text-lg">Select up to 3 colleges for a detailed side-by-side AI analysis.</p>
-      </div>
+    <div className="min-h-screen bg-[#0a0d14] p-4 md:p-8 selection:bg-purple-500/30">
+      <div className="max-w-7xl mx-auto space-y-12">
+        <header className="text-center space-y-4">
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-6xl font-black text-white font-syne"
+          >
+            College Comparison
+          </motion.h1>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">Select up to 3 colleges for a detailed side-by-side AI analysis.</p>
+        </header>
 
-      <div className="space-y-8">
-        {/* Search Section */}
-        <div id="cmp-search" className="relative max-w-2xl mx-auto md:mx-0">
+        {/* Filters Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">State</label>
+            <div className="relative">
+              <select 
+                value={filters.state} 
+                onChange={(e) => setFilters({...filters, state: e.target.value})}
+                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
+              >
+                {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Type</label>
+            <div className="relative">
+              <select 
+                value={filters.type} 
+                onChange={(e) => setFilters({...filters, type: e.target.value})}
+                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
+              >
+                {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Entrance Exam</label>
+            <div className="relative">
+              <select 
+                value={filters.exam} 
+                onChange={(e) => setFilters({...filters, exam: e.target.value})}
+                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
+              >
+                {EXAMS.map(x => <option key={x} value={x}>{x}</option>)}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Sort By</label>
+            <div className="relative">
+              <select 
+                value={filters.sort} 
+                onChange={(e) => setFilters({...filters, sort: e.target.value})}
+                className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-slate-200 outline-none focus:border-purple-500/50 appearance-none transition-all cursor-pointer font-bold"
+              >
+                {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={18} />
+            </div>
+          </div>
+        </div>
+
+        {/* Search Input */}
+        <div className="relative max-w-2xl mx-auto" ref={searchRef}>
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-purple-500 transition-colors" />
             <input
-              ref={inputRef}
-              className="w-full h-14 pl-12 pr-4 bg-white/40 backdrop-blur-md border-2 border-primary/10 rounded-2xl outline-none focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-lg"
-              placeholder='Search colleges (e.g. "VIT", "Anna", "IIT")...'
+              type="text"
+              placeholder="Search for a college by name..."
               value={query}
-              disabled={selected.length >= 3}
-              onChange={e => { setQuery(e.target.value); setShowDrop(true); }}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setShowDrop(true)}
+              className="w-full h-20 bg-white/5 border-2 border-white/10 rounded-[2rem] px-16 text-xl font-bold text-white outline-none focus:border-purple-500/50 focus:bg-white/[0.08] transition-all shadow-2xl"
             />
           </div>
 
@@ -241,197 +263,127 @@ export default function ComparePage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white/80 backdrop-blur-xl border border-primary/10 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[400px] overflow-y-auto"
+                className="absolute top-full left-0 right-0 mt-4 bg-[#111520] border border-white/10 rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.5)] overflow-hidden z-50 max-h-[400px] overflow-y-auto backdrop-blur-3xl"
               >
-                {query.length < 2 ? (
+                {searching ? (
+                  <div className="p-12 text-center text-slate-500 flex items-center justify-center gap-3">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="font-bold tracking-widest uppercase text-xs">Scanning Database...</span>
+                  </div>
+                ) : results.length === 0 ? (
+                  <div className="p-12 text-center text-slate-500 font-bold tracking-widest uppercase text-xs">No colleges found matching filters</div>
+                ) : (
                   <div className="p-2">
-                    <div className="p-3 text-[10px] font-black text-primary/60 uppercase tracking-widest flex items-center gap-2">
-                        <Star className="h-3 w-3" /> Popular Choices
-                    </div>
-                    {POPULAR_COLLEGES.map(c => (
+                    {results.map(c => (
                         <button
                           key={c.id}
-                          className="w-full p-4 text-left hover:bg-primary/5 rounded-xl transition-colors flex justify-between items-center"
+                          className="w-full p-6 text-left hover:bg-white/5 rounded-2xl transition-all flex justify-between items-center group"
                           onMouseDown={() => addCollege(c)}
                         >
                           <div>
-                            <div className="font-bold text-primary">{c.name}</div>
-                            <div className="text-[10px] text-muted-foreground mt-0.5">
+                            <div className="font-black text-white text-lg group-hover:text-purple-400 transition-colors">{c.name}</div>
+                            <div className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">
                                 {[c.city, c.state].filter(Boolean).join(", ")}
                             </div>
                           </div>
-                          <div className="text-[10px] font-black text-secondary/60">TOP {c.nirf_rank}</div>
+                          <div className="h-10 w-10 bg-white/5 rounded-full flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all">
+                              <Sparkles size={16} />
+                          </div>
                         </button>
                     ))}
                   </div>
-                ) : searching ? (
-                  <div className="p-8 text-center text-muted-foreground flex items-center justify-center gap-3">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Searching database...
-                  </div>
-                ) : results.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground">No colleges found for "{query}"</div>
-                ) : (
-                  results.map(c => (
-                    <button
-                      key={c.id}
-                      className="w-full p-4 text-left hover:bg-primary/5 border-b border-primary/5 last:border-0 transition-colors"
-                      onMouseDown={() => addCollege(c)}
-                    >
-                      <div className="font-bold text-primary">{c.name}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {[c.city, c.state].filter(Boolean).join(", ")}
-                      </div>
-                    </button>
-                  ))
                 )}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Selected Tags */}
-        <div className="flex flex-wrap gap-3 min-h-[40px]">
-          {selected.map(c => (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              key={c.id}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm"
-            >
-              <GraduationCap className="h-4 w-4" />
-              <span className="max-w-[150px] truncate">{c.name}</span>
-              <button onClick={() => removeCollege(c.id)} className="hover:text-destructive transition-colors">
-                <X className="h-4 w-4" />
-              </button>
-            </motion.div>
-          ))}
-          {selected.length === 3 && (
-            <span className="text-xs text-muted-foreground self-center italic">Maximum 3 colleges reached</span>
-          )}
+        {/* Selected Colleges Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {selected.map((c, i) => (
+                <motion.div
+                    key={c.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-[#111520] border border-white/5 rounded-[2.5rem] p-8 relative group overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onClick={() => removeCollege(c.id)} className="h-10 w-10 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                            <X size={20} />
+                        </button>
+                    </div>
+                    <div className="mb-6">
+                        <div className="text-[10px] font-black text-purple-500 uppercase tracking-widest mb-2">College {i+1}</div>
+                        <h3 className="text-2xl font-black text-white line-clamp-2 font-syne">{c.name}</h3>
+                        <p className="text-sm font-bold text-slate-500 mt-2">{c.city}, {c.state}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/5 rounded-2xl p-4">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">NIRF Rank</p>
+                            <p className="font-black text-white text-xl">#{c.nirf_rank || '—'}</p>
+                        </div>
+                        <div className="bg-white/5 rounded-2xl p-4">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Avg Package</p>
+                            <p className="font-black text-emerald-400 text-xl">{c.avg_package_lpa || '—'}L</p>
+                        </div>
+                    </div>
+                </motion.div>
+            ))}
+            {selected.length < 3 && (
+                <div className="border-2 border-dashed border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center p-12 text-center">
+                    <div className="h-16 w-16 bg-white/5 rounded-full flex items-center justify-center text-slate-600 mb-4">
+                        <Plus size={32} />
+                    </div>
+                    <p className="text-slate-600 font-bold uppercase tracking-widest text-xs">Add up to 3 colleges</p>
+                </div>
+            )}
         </div>
 
-        {/* Compare Button */}
-        <AnimatePresence>
-          {selected.length >= 2 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-            >
-              <Button 
-                onClick={handleCompare} 
-                disabled={aiLoading}
-                size="lg"
-                className="h-14 px-8 rounded-2xl gap-3 text-lg font-bold shadow-xl shadow-primary/20"
-              >
-                {aiLoading ? (
-                  <><Loader2 className="h-5 w-5 animate-spin" /> Analyzing with AI...</>
-                ) : (
-                  <><Sparkles className="h-5 w-5" /> Start AI Comparison</>
-                )}
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* College Cards Grid */}
-        {selected.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {selected.map((c, idx) => (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-              >
-                <Card className="rounded-3xl border-primary/10 shadow-lg bg-white/40 backdrop-blur-md overflow-hidden hover:shadow-xl transition-all h-full">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="inline-flex px-2 py-1 bg-primary/5 rounded-lg text-[10px] font-black text-primary tracking-widest uppercase">
-                        Engineering
-                      </div>
-                      <button onClick={() => removeCollege(c.id)} className="text-muted-foreground hover:text-destructive p-1">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <h3 className="text-xl font-bold text-primary mb-2 line-clamp-2">{c.name}</h3>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
-                      <Globe className="h-3 w-3" />
-                      {[c.city, c.state].filter(Boolean).join(", ")}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: "NIRF Rank", value: c.nirf_rank ? `#${c.nirf_rank}` : "N/A", color: "text-purple-500" },
-                        { label: "Cutoff %", value: c.cutoff_general ? `${c.cutoff_general}%` : "N/A", color: "text-orange-500" },
-                        { label: "Avg Package", value: c.avg_package_lpa ? `${c.avg_package_lpa}L` : "N/A", color: "text-green-500" },
-                        { label: "NAAC", value: c.naac_grade || "N/A", color: "text-blue-500" },
-                        { label: "Est. Fees", value: c.fees_approx || "N/A", color: "text-slate-600", full: true }
-                      ].map((stat, i) => (
-                        <div key={i} className={cn("p-3 bg-white/50 rounded-2xl border border-primary/5", stat.full && "col-span-2")}>
-                          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">{stat.label}</p>
-                          <p className={cn("text-lg font-black", stat.color)}>{stat.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <Card className="rounded-[3rem] border-dashed border-2 border-primary/20 bg-primary/5 p-16 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="h-16 w-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <GraduationCap className="h-8 w-8 text-primary" />
-              </div>
-              <h2 className="text-2xl font-black text-primary mb-4">Select Colleges to Compare</h2>
-              <p className="text-muted-foreground">Search and add at least two colleges to see a side-by-side comparison and get AI-powered insights.</p>
+        {selected.length >= 2 && (
+            <div className="text-center">
+                <button 
+                    onClick={handleCompare}
+                    disabled={aiLoading}
+                    className="h-20 px-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-[2rem] text-white font-black text-xl shadow-2xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-4 mx-auto"
+                >
+                    {aiLoading ? <Loader2 className="animate-spin" /> : <BrainCircuit size={28} />}
+                    {aiLoading ? "AI Processing..." : "Start Deep AI Comparison"}
+                </button>
             </div>
-          </Card>
         )}
 
-        {/* AI Analysis Result */}
-        {(aiLoading || aiText || aiErr) && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="pt-8"
-          >
-            <Card className="rounded-[2.5rem] border-2 border-primary/20 bg-white/80 backdrop-blur-xl shadow-2xl overflow-hidden">
-              <div className="bg-primary/5 p-6 md:p-8 flex items-center gap-4 border-b border-primary/10">
-                <div className="h-12 w-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg">
-                  <BrainCircuit className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-primary">AI Counselor Comparison</h3>
-                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">Llama-3.3 Powered Insights</p>
-                </div>
-              </div>
-              <CardContent className="p-6 md:p-10">
-                {aiLoading && (
-                  <div className="py-12 space-y-4 text-center">
-                    <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-                    <p className="text-muted-foreground animate-pulse font-medium">Deeply analyzing placements, campus life, and cutoffs...</p>
-                  </div>
-                )}
-                {aiErr && (
-                  <div className="p-6 bg-destructive/5 border border-destructive/20 rounded-3xl text-destructive flex items-center gap-3">
-                    <Info className="h-5 w-5" />
-                    <p className="font-medium">{aiErr}</p>
-                  </div>
-                )}
-                {aiText && (
-                  <div className="prose prose-primary max-w-none prose-p:text-slate-600 prose-headings:text-primary prose-headings:font-black prose-p:leading-relaxed whitespace-pre-wrap">
-                    {aiText}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+        {/* AI Result */}
+        <AnimatePresence>
+            {(aiText || aiErr) && (
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-[#111520] border border-white/10 rounded-[3.5rem] p-10 md:p-16 shadow-[0_48px_120px_rgba(0,0,0,0.6)] relative overflow-hidden"
+                >
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500" />
+                    <div className="flex items-center gap-6 mb-12">
+                        <div className="h-20 w-20 bg-purple-500/10 rounded-[2rem] flex items-center justify-center text-purple-400 shadow-2xl border border-purple-500/20">
+                            <BrainCircuit size={40} />
+                        </div>
+                        <div>
+                            <h2 className="text-4xl font-black text-white font-syne">AI Counselor Report</h2>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-sm mt-1">Intelligent Side-by-Side Analysis</p>
+                        </div>
+                    </div>
+
+                    <div className="prose prose-invert prose-purple max-w-none prose-h2:text-white prose-h2:font-black prose-p:text-slate-300 prose-p:text-lg prose-p:leading-relaxed whitespace-pre-wrap">
+                        {aiText}
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
       </div>
     </div>
   );
+}
+
+function Plus({ size }: { size: number }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    )
 }
