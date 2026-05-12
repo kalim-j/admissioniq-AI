@@ -105,7 +105,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={cn(jakarta.variable, syne.variable, dmSans.variable, "min-h-screen bg-[#0a0d14] font-sans antialiased")}>
+      <body className={cn(jakarta.variable, syne.variable, dmSans.variable, "min-h-screen bg-[#05071a] font-sans antialiased")}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

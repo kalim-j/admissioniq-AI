@@ -7,7 +7,9 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { 
   Star, Send, Loader2, Building, BookOpen, 
-  Calendar, MapPin, MessageSquare, Quote
+  Calendar, MapPin, MessageSquare, Quote,
+  Sparkles, ShieldCheck, Heart, User,
+  ArrowRight, Award
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -37,14 +39,14 @@ export default function SubmitTestimonial() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.college || !formData.review) {
-      toast.error("Please fill in all required fields");
+      toast.error("Required fields missing from transmission.");
       return;
     }
 
     setLoading(true);
     try {
       await addDoc(collection(db, "testimonials"), {
-        name: user?.displayName || user?.email?.split('@')[0] || "Anonymous",
+        name: user?.displayName || user?.email?.split('@')[0] || "Anonymous Student",
         avatar: user?.photoURL || null,
         college: formData.college,
         stream: formData.stream,
@@ -57,114 +59,125 @@ export default function SubmitTestimonial() {
         createdAt: serverTimestamp()
       });
 
-      toast.success("Thank you! Your review will appear after approval.");
+      toast.success("Intelligence shared! Awaiting validation.");
       router.push("/dashboard");
     } catch (error: any) {
-      toast.error("Failed to submit testimonial: " + error.message);
+      toast.error("Transmission failure: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]"><Loader2 className="animate-spin text-purple-500" /></div>;
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#05071a] flex items-center justify-center">
+      <Loader2 className="h-10 w-10 text-indigo-400 animate-spin" />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] py-20 px-4 relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full" />
+    <div className="min-h-screen bg-[#05071a] text-white relative overflow-hidden selection:bg-teal-500/30 py-24 px-6">
+      {/* Background Ambience */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-teal-500/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[150px] pointer-events-none" />
       </div>
 
-      <div className="max-w-3xl mx-auto space-y-12 relative z-10">
-        <div className="text-center space-y-4">
+      <div className="max-w-4xl mx-auto space-y-16 relative z-10">
+        <header className="text-center space-y-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold uppercase tracking-widest"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4"
           >
-            <Quote size={16} />
-            Share Your Success
+            <Quote size={14} />
+            Community Intelligence
           </motion.div>
-          <h1 className="text-4xl md:text-6xl font-black text-white font-syne tracking-tighter">
-            Inspire Others with <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Your Story</span>
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
+            Share Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-indigo-400">Success Story</span>
           </h1>
-          <p className="text-slate-400 font-medium">
-            Tell us about your admission success. Your experience helps future students find their path.
+          <p className="text-white/30 font-bold uppercase tracking-[0.2em] text-[10px] max-w-lg mx-auto">
+            Your admission journey inspires the next generation of scholars. help them find their perfect match.
           </p>
-        </div>
+        </header>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#111520] border border-white/5 rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden"
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-white/[0.02] border border-white/5 rounded-[4rem] p-10 md:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.6)] relative overflow-hidden backdrop-blur-3xl group"
         >
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  <Building size={14} /> College Admitted To *
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-500 via-emerald-500 to-indigo-500" />
+          <div className="absolute top-0 right-0 p-16 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+             <Sparkles size={250} className="text-teal-500" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-12 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <Building size={12} className="text-teal-400" /> Institution Admitted To
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. IIT Madras"
+                  placeholder="e.g. NIT Trichy"
                   value={formData.college}
                   onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-                  className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
+                  className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-teal-500/50 transition-all placeholder:text-white/10"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  <BookOpen size={14} /> Stream / Course *
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <BookOpen size={12} className="text-teal-400" /> Specialization / Stream
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. B.Tech CSE"
+                  placeholder="e.g. Mechanical Engineering"
                   value={formData.stream}
                   onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
-                  className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
+                  className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-teal-500/50 transition-all placeholder:text-white/10"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  <Calendar size={14} /> Year of Admission
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <Calendar size={12} className="text-teal-400" /> Admission Cycle
                 </label>
-                <select
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-emerald-500 outline-none transition-all appearance-none"
-                >
-                  <option value="2023" className="bg-[#111520]">2023</option>
-                  <option value="2024" className="bg-[#111520]">2024</option>
-                  <option value="2025" className="bg-[#111520]">2025</option>
-                  <option value="2026" className="bg-[#111520]">2026</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-teal-500/50 appearance-none cursor-pointer transition-all"
+                  >
+                    <option value="2023" className="bg-[#05071a]">2023</option>
+                    <option value="2024" className="bg-[#05071a]">2024</option>
+                    <option value="2025" className="bg-[#05071a]">2025</option>
+                    <option value="2026" className="bg-[#05071a]">2026</option>
+                  </select>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  <MapPin size={14} /> City / District (Optional)
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <MapPin size={12} className="text-teal-400" /> Current Location
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Chennai"
+                  placeholder="e.g. Bangalore"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
+                  className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-teal-500/50 transition-all placeholder:text-white/10"
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <Star size={14} /> Your Rating
+            <div className="space-y-6">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <Award size={14} className="text-teal-400" /> Platform Experience Rating
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-4 p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 w-fit">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -172,15 +185,15 @@ export default function SubmitTestimonial() {
                     onMouseEnter={() => setHoveredRating(star)}
                     onMouseLeave={() => setHoveredRating(0)}
                     onClick={() => setRating(star)}
-                    className="transition-all transform hover:scale-110 active:scale-95"
+                    className="transition-all transform hover:scale-125 active:scale-95"
                   >
                     <Star
-                      size={36}
+                      size={48}
                       className={cn(
-                        "transition-all",
+                        "transition-all duration-300",
                         (hoveredRating || rating) >= star
-                          ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]"
-                          : "text-slate-700"
+                          ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]"
+                          : "text-white/5"
                       )}
                     />
                   </button>
@@ -188,31 +201,37 @@ export default function SubmitTestimonial() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <MessageSquare size={14} /> Your Experience (Max 200 chars) *
-              </label>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center px-1">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <MessageSquare size={12} className="text-teal-400" /> Experience Intelligence (Max 200)
+                </label>
+                <span className="text-[10px] font-black text-white/10 uppercase tracking-widest">{formData.review.length} / 200</span>
+              </div>
               <textarea
                 required
                 maxLength={200}
-                placeholder="Share how CollegeMatch-AI helped you..."
+                placeholder="How did CollegeMatch-AI refine your decision making process…"
                 value={formData.review}
                 onChange={(e) => setFormData({ ...formData, review: e.target.value })}
-                className="w-full h-40 bg-white/5 border border-white/10 rounded-[2rem] p-6 text-white focus:border-emerald-500 outline-none transition-all resize-none placeholder:text-slate-600"
+                className="w-full h-44 bg-white/[0.05] border border-white/10 rounded-[2.5rem] p-8 text-white outline-none focus:border-teal-500/30 transition-all font-medium resize-none placeholder:text-white/10 leading-relaxed"
               />
-              <div className="text-right text-[10px] font-black text-slate-600 uppercase tracking-widest">
-                {formData.review.length} / 200
-              </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-lg rounded-2xl shadow-xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="animate-spin" /> : <Send size={24} />}
-              {loading ? "Submitting..." : "Submit My Success Story"}
-            </button>
+            <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center gap-8">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full md:w-auto h-20 px-12 text-lg font-black group shadow-[0_20px_50px_rgba(20,184,166,0.2)]"
+              >
+                {loading ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+                {loading ? "Transmitting..." : "Broadcast Success Story"}
+              </button>
+              <div className="flex items-center gap-3 opacity-20">
+                <ShieldCheck size={16} />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Verified Community Submission Protocol</span>
+              </div>
+            </div>
           </form>
         </motion.div>
       </div>

@@ -9,20 +9,14 @@ import {
   Search, GraduationCap, Building, Calendar, 
   ExternalLink, Info, Loader2, ChevronDown, ChevronUp,
   MapPin, BookOpen, Clock, Award, Star, Filter, ArrowUpDown, 
-  CheckCircle2, Lightbulb
+  CheckCircle2, Lightbulb, Target, ShieldCheck, Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STREAMS = [
-  "Engineering & Technology",
-  "Medical & Health Sciences",
-  "Science & Research",
-  "Commerce & Finance",
-  "Arts & Humanities",
-  "Law & Legal Studies",
-  "Management & Business",
-  "Agriculture & Veterinary",
-  "Education & Teaching"
+  "Engineering & Technology", "Medical & Health Sciences", "Science & Research",
+  "Commerce & Finance", "Arts & Humanities", "Law & Legal Studies",
+  "Management & Business", "Agriculture & Veterinary", "Education & Teaching"
 ];
 const COURSE_LEVELS = ["UG", "PG"];
 
@@ -56,10 +50,10 @@ export default function EntranceExamGuide() {
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) throw new Error("Failed to fetch exams");
+      if (!response.ok) throw new Error("Exam intelligence fetch failure.");
       const data = await response.json();
       setResults(data);
-      toast.success(`Found ${data.length} relevant exams!`);
+      toast.success(`Discovered ${data.length} mission-critical exams!`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -79,7 +73,7 @@ export default function EntranceExamGuide() {
         return priority[a.importance] - priority[b.importance];
       }
       if (sortBy === "name") return a.short_name.localeCompare(b.short_name);
-      return 0; // Exam date sorting is complex due to strings, skipping for simplicity or can be added later
+      return 0;
     });
   };
 
@@ -90,97 +84,116 @@ export default function EntranceExamGuide() {
   };
 
   const levelColor = (lvl: string) => {
-    if (lvl === "National") return "bg-blue-500/10 text-blue-400 border-blue-500/20";
-    if (lvl === "State") return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
-    return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+    if (lvl === "National") return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
+    if (lvl === "State") return "bg-teal-500/10 text-teal-400 border-teal-500/20";
+    return "bg-purple-500/10 text-purple-400 border-purple-500/20";
   };
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]"><Loader2 className="animate-spin text-purple-500" /></div>;
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#05071a] flex items-center justify-center">
+      <Loader2 className="h-10 w-10 text-indigo-400 animate-spin" />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] py-20 px-4">
-      <div className="max-w-7xl mx-auto space-y-12">
-        {/* Header */}
-        <div className="text-center space-y-4">
+    <div className="min-h-screen bg-[#05071a] text-white relative overflow-hidden selection:bg-indigo-500/30 py-24">
+      {/* Background Ambience */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-500/5 rounded-full blur-[150px] pointer-events-none" />
+      </div>
+
+      <div className="container mx-auto px-6 max-w-7xl relative z-10">
+        <header className="text-center space-y-6 mb-20">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-bold uppercase tracking-widest"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4"
           >
-            <Award size={16} />
-            Entrance Exam Guide
+            <Award size={14} />
+            Admission Benchmarks
           </motion.div>
-          <h1 className="text-4xl md:text-6xl font-black text-white font-syne tracking-tighter">
-            Master Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Admissions Journey</span>
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
+            Master Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-teal-400">Admissions Journey</span>
           </h1>
-          <p className="text-slate-400 max-w-2xl mx-auto font-medium">
-            Find every national, state, and university-level entrance exam you need to crack your dream college.
+          <p className="text-white/30 font-bold uppercase tracking-[0.2em] text-[10px] max-w-lg mx-auto">
+            Find every national, state, and university-level entrance benchmark required to secure your placement in elite institutions.
           </p>
-        </div>
+        </header>
 
-        {/* Search Form */}
+        {/* Search Engine */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-[#111520] border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/[0.02] border border-white/5 rounded-[4rem] p-10 md:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.6)] backdrop-blur-3xl mb-16 relative overflow-hidden group"
         >
-          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <GraduationCap size={14} /> Course Level
+          <div className="absolute top-0 right-0 p-16 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+             <Target size={300} className="text-indigo-500" />
+          </div>
+
+          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-10 items-end relative z-10">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <GraduationCap size={12} className="text-indigo-500" /> Academic Level
               </label>
-              <select
-                value={formData.level}
-                onChange={(e) => setFormData({ ...formData, level: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-indigo-500 outline-none transition-all appearance-none"
-              >
-                {COURSE_LEVELS.map(l => <option key={l} value={l} className="bg-[#111520]">{l}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={formData.level}
+                  onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+                  className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-indigo-500/50 appearance-none cursor-pointer transition-all"
+                >
+                  {COURSE_LEVELS.map(l => <option key={l} value={l} className="bg-[#05071a]">{l}</option>)}
+                </select>
+                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" size={16} />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <BookOpen size={14} /> Academic Stream
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <BookOpen size={12} className="text-indigo-500" /> Subject Stream
               </label>
-              <select
-                value={formData.stream}
-                onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-indigo-500 outline-none transition-all appearance-none"
-              >
-                {STREAMS.map(s => <option key={s} value={s} className="bg-[#111520]">{s}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={formData.stream}
+                  onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
+                  className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-indigo-500/50 appearance-none cursor-pointer transition-all"
+                >
+                  {STREAMS.map(s => <option key={s} value={s} className="bg-[#05071a]">{s}</option>)}
+                </select>
+                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" size={16} />
+              </div>
             </div>
 
-            <div className="md:col-span-2 pt-4">
+            <div className="md:col-span-2 pt-6">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-16 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-lg rounded-2xl shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+                className="btn-primary w-full h-20 text-xl font-black group"
               >
-                {loading ? <Loader2 className="animate-spin" /> : <Award size={24} />}
-                {loading ? "Analyzing Exams..." : "Show Relevant Exams"}
+                {loading ? <Loader2 className="animate-spin" size={24} /> : <Zap size={24} className="group-hover:rotate-12 transition-transform" />}
+                {loading ? "Analyzing Exam Repository..." : "Execute Intelligence Search"}
               </button>
             </div>
           </form>
         </motion.div>
 
-        {/* Filters and Sorting */}
+        {/* Intelligence Filters */}
         {results.length > 0 && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/[0.02] border border-white/5 p-6 rounded-3xl">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-slate-500 text-xs font-black uppercase tracking-widest">
-                <Filter size={14} /> Filter Level:
+          <div className="flex flex-col xl:flex-row justify-between items-center gap-8 bg-white/[0.03] border border-white/5 p-8 rounded-[2.5rem] mb-12 backdrop-blur-md">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="flex items-center gap-2 text-white/20 text-[10px] font-black uppercase tracking-widest">
+                <Filter size={14} className="text-indigo-500" /> Geographic Scope:
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 justify-center">
                 {["All", "National", "State", "University"].map(lvl => (
                   <button
                     key={lvl}
                     onClick={() => setFilterLevel(lvl)}
                     className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
+                      "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
                       filterLevel === lvl 
-                        ? "bg-indigo-500 border-indigo-400 text-white" 
-                        : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                        ? "bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20" 
+                        : "bg-white/[0.05] border-white/5 text-white/40 hover:bg-white/10 hover:text-white"
                     )}
                   >
                     {lvl}
@@ -189,103 +202,110 @@ export default function EntranceExamGuide() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-slate-500 text-xs font-black uppercase tracking-widest">
-                <ArrowUpDown size={14} /> Sort By:
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 text-white/20 text-[10px] font-black uppercase tracking-widest">
+                <ArrowUpDown size={14} className="text-indigo-500" /> Sequence Logic:
               </div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none focus:border-indigo-500"
-              >
-                <option value="importance" className="bg-[#111520]">Importance</option>
-                <option value="name" className="bg-[#111520]">Name</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-white/[0.05] border border-white/10 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:border-indigo-500 appearance-none cursor-pointer"
+                >
+                  <option value="importance" className="bg-[#05071a]">Impact Priority</option>
+                  <option value="name" className="bg-[#05071a]">Alphabetic Sequence</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" size={14} />
+              </div>
             </div>
           </div>
         )}
 
-        {/* Results Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        {/* Results Matrix */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <AnimatePresence>
             {getSortedAndFilteredExams().map((exam, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-[#111520] border border-white/5 rounded-[2.5rem] p-8 space-y-6 hover:border-indigo-500/30 transition-all group relative overflow-hidden"
+                transition={{ delay: index * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white/[0.02] border border-white/5 rounded-[3.5rem] p-10 space-y-8 hover:border-indigo-500/30 transition-all group relative overflow-hidden backdrop-blur-md"
               >
-                <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-all rotate-12">
-                   <Award size={120} />
+                <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                   <Award size={180} className="text-indigo-500" />
                 </div>
 
-                <div className="space-y-1 relative z-10">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-3xl font-black text-indigo-400 tracking-tighter">
+                <div className="space-y-3 relative z-10">
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                    <h3 className="text-4xl font-black text-indigo-400 tracking-tighter group-hover:text-white transition-colors leading-none">
                       {exam.short_name}
                     </h3>
                     <div className={cn(
-                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                      "px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border shadow-lg",
                       importanceColor(exam.importance)
                     )}>
-                      {exam.importance} Importance
+                      {exam.importance} Priority
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-slate-300">{exam.name}</p>
+                  <p className="text-sm font-bold text-white/40 uppercase tracking-widest">{exam.name}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-2 relative z-10">
-                  <span className={cn("px-3 py-1 border text-[10px] font-black uppercase tracking-widest rounded-full", levelColor(exam.level))}>
-                    {exam.level}
+                  <span className={cn("px-4 py-1.5 border text-[9px] font-black uppercase tracking-widest rounded-lg", levelColor(exam.level))}>
+                    {exam.level} Scope
                   </span>
-                  <span className="px-3 py-1 bg-white/5 border border-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                  <span className="px-4 py-1.5 bg-white/[0.05] border border-white/5 text-white/30 text-[9px] font-black uppercase tracking-widest rounded-lg">
                     {exam.mode}
                   </span>
-                  <span className="px-3 py-1 bg-white/5 border border-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                  <span className="px-4 py-1.5 bg-white/[0.05] border border-white/5 text-white/30 text-[9px] font-black uppercase tracking-widest rounded-lg">
                     {exam.frequency}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5 relative z-10">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Calendar size={12} /> Exam Date
+                <div className="grid grid-cols-2 gap-6 p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 relative z-10">
+                  <div className="space-y-2">
+                    <p className="text-[9px] font-black text-white/20 uppercase tracking-widest flex items-center gap-2">
+                      <Calendar size={12} className="text-indigo-500" /> Examination Window
                     </p>
-                    <p className="text-sm font-bold text-white">{exam.exam_date}</p>
+                    <p className="text-base font-black text-white tabular-nums">{exam.exam_date}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Clock size={12} /> Registration
+                  <div className="space-y-2">
+                    <p className="text-[9px] font-black text-white/20 uppercase tracking-widest flex items-center gap-2">
+                      <Clock size={12} className="text-indigo-500" /> Registration Baseline
                     </p>
-                    <p className="text-sm font-bold text-white">{exam.registration_start}</p>
+                    <p className="text-base font-black text-white tabular-nums">{exam.registration_start}</p>
                   </div>
                 </div>
 
-                <div className="space-y-2 relative z-10">
-                   <p className="text-sm text-slate-400 font-medium italic border-l-2 border-indigo-500/50 pl-3">
+                <div className="space-y-4 relative z-10">
+                   <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Eligibility Protocol</p>
+                   <p className="text-base text-white/50 font-medium italic leading-relaxed pl-4 border-l-2 border-indigo-500/30">
                      &quot;{exam.eligibility}&quot;
                    </p>
                 </div>
 
-                <div className="space-y-3 relative z-10">
-                  <div className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
-                    <BookOpen size={14} className="text-indigo-500" /> Syllabus Highlights
+                <div className="space-y-4 relative z-10">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-white/20 uppercase tracking-widest">
+                    <BookOpen size={16} className="text-indigo-500" /> Syllabus Intelligence
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {exam.syllabus_highlights.map((topic: string, i: number) => (
-                      <span key={i} className="px-2 py-1 bg-indigo-500/5 border border-indigo-500/10 text-indigo-300 text-[10px] font-bold rounded-lg">
+                      <span key={i} className="px-3 py-1.5 bg-indigo-500/5 border border-indigo-500/10 text-indigo-300 text-[10px] font-black uppercase rounded-lg">
                         {topic}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl relative z-10 group/tip">
-                  <div className="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-widest mb-2">
-                    <Lightbulb size={16} className="animate-pulse" /> Expert Tip
+                <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-3xl relative z-10 group/tip overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover/tip:scale-110 transition-transform">
+                    <Lightbulb size={48} className="text-emerald-400" />
                   </div>
-                  <p className="text-xs font-medium text-slate-400 leading-relaxed group-hover/tip:text-slate-300 transition-colors">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-3">
+                    <Zap size={14} className="animate-pulse" /> Expert Intelligence Tip
+                  </div>
+                  <p className="text-sm font-medium text-white/40 leading-relaxed group-hover/tip:text-white/60 transition-colors relative z-10">
                     {exam.tip}
                   </p>
                 </div>
@@ -294,10 +314,10 @@ export default function EntranceExamGuide() {
                   href={exam.official_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full h-14 bg-white/5 border border-white/10 hover:border-indigo-500/50 text-white font-black rounded-xl flex items-center justify-center gap-2 transition-all relative z-10 group/btn"
+                  className="w-full h-16 btn-primary rounded-2xl flex items-center justify-center gap-3 group text-sm font-black relative z-10"
                 >
-                  Official Exam Site 
-                  <ExternalLink size={18} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                  Official Examination Portal 
+                  <ExternalLink size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </a>
               </motion.div>
             ))}
@@ -305,11 +325,17 @@ export default function EntranceExamGuide() {
         </div>
 
         {results.length === 0 && !loading && (
-          <div className="text-center py-20 space-y-6">
-            <div className="h-24 w-24 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/10 text-slate-700">
-              <Award size={48} />
+          <div className="text-center py-32 space-y-8">
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-indigo-500/10 blur-[60px] rounded-full pointer-events-none" />
+              <div className="h-32 w-32 bg-white/[0.03] rounded-[3rem] flex items-center justify-center mx-auto border border-white/5 text-white/10 relative z-10 shadow-2xl">
+                <Target size={56} className="animate-pulse" />
+              </div>
             </div>
-            <p className="text-slate-500 font-bold">Relevant entrance exams will appear here</p>
+            <div className="space-y-2">
+              <p className="text-white font-black text-xl tracking-tight">Intelligence Matrix Ready</p>
+              <p className="text-white/20 font-bold uppercase tracking-[0.2em] text-[9px]">Select your academic parameters to discover mission-critical exams</p>
+            </div>
           </div>
         )}
       </div>

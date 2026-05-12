@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import { 
   Search, GraduationCap, Building, Banknote, 
   Calendar, ExternalLink, Info, Loader2, ChevronDown, ChevronUp,
-  MapPin, Users, BookOpen, Wallet, Activity
+  MapPin, Users, BookOpen, Wallet, Activity, Zap,
+  ShieldCheck, Sparkles, ArrowRight
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { cn } from "@/lib/utils";
 
 const INDIAN_STATES = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
@@ -19,22 +21,15 @@ const INDIAN_STATES = [
   "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
   "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
   "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
-  "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+  "Delhi", "Chandigarh", "Puducherry", "Jammu & Kashmir"
 ];
 
 const COMMUNITIES = ["BC", "MBC", "OC", "SC", "ST", "EWS", "Minority"];
 const COURSE_LEVELS = ["UG", "PG"];
 const STREAMS = [
-  "Engineering & Technology",
-  "Medical & Health Sciences",
-  "Science & Research",
-  "Commerce & Finance",
-  "Arts & Humanities",
-  "Law & Legal Studies",
-  "Management & Business",
-  "Agriculture & Veterinary",
-  "Education & Teaching"
+  "Engineering & Technology", "Medical & Health Sciences", "Science & Research",
+  "Commerce & Finance", "Arts & Humanities", "Law & Legal Studies",
+  "Management & Business", "Agriculture & Veterinary", "Education & Teaching"
 ];
 const INCOME_RANGES = ["Below 1L", "1L - 2.5L", "2.5L - 5L", "Above 5L"];
 
@@ -63,7 +58,7 @@ export default function ScholarshipFinder() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.percentage) {
-      toast.error("Please enter your 12th percentage");
+      toast.error("Academic percentage baseline required.");
       return;
     }
 
@@ -76,11 +71,10 @@ export default function ScholarshipFinder() {
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) throw new Error("Failed to fetch scholarships");
+      if (!response.ok) throw new Error("Intelligence fetch failed.");
       const data = await response.json();
       setResults(data);
 
-      // Save to Firestore
       if (user) {
         await addDoc(collection(db, "scholarships", user.uid, "searches"), {
           studentData: formData,
@@ -89,7 +83,7 @@ export default function ScholarshipFinder() {
         });
       }
 
-      toast.success(`Found ${data.length} potential scholarships!`);
+      toast.success(`Discovered ${data.length} financial opportunities!`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -97,179 +91,158 @@ export default function ScholarshipFinder() {
     }
   };
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]"><Loader2 className="animate-spin text-purple-500" /></div>;
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#05071a] flex items-center justify-center">
+      <Loader2 className="h-10 w-10 text-indigo-400 animate-spin" />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] py-20 px-4">
-      <div className="max-w-7xl mx-auto space-y-12">
-        {/* Header */}
-        <div className="text-center space-y-4">
+    <div className="min-h-screen bg-[#05071a] text-white relative overflow-hidden selection:bg-indigo-500/30 py-24">
+      {/* Background Ambience */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-500/5 rounded-full blur-[150px] pointer-events-none" />
+      </div>
+
+      <div className="container mx-auto px-6 max-w-7xl relative z-10">
+        <header className="text-center space-y-6 mb-20">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-bold uppercase tracking-widest"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4"
           >
-            <Banknote size={16} />
-            AI Scholarship Finder
+            <Banknote size={14} />
+            Financial Intelligence
           </motion.div>
-          <h1 className="text-4xl md:text-6xl font-black text-white font-syne tracking-tighter">
-            Unlock Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-500">Education Funds</span>
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-tight">
+            Unlock Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-teal-400">Education Funds</span>
           </h1>
-          <p className="text-slate-400 max-w-2xl mx-auto font-medium">
-            Let our AI search through thousands of government and private scholarships to find the ones you are eligible for.
+          <p className="text-white/30 font-bold uppercase tracking-[0.2em] text-[10px] max-w-lg mx-auto">
+            Our AI engine scans through 10,000+ government and private endowments to find your perfect matching grants.
           </p>
-        </div>
+        </header>
 
-        {/* Search Form */}
+        {/* Search Matrix */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-[#111520] border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/[0.02] border border-white/5 rounded-[4rem] p-10 md:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.6)] backdrop-blur-3xl mb-16 relative overflow-hidden group"
         >
-          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <MapPin size={14} /> Home State
-              </label>
-              <select
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-purple-500 outline-none transition-all appearance-none"
-              >
-                {INDIAN_STATES.map(s => <option key={s} value={s} className="bg-[#111520]">{s}</option>)}
-              </select>
-            </div>
+          <div className="absolute top-0 right-0 p-16 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+             <Banknote size={300} className="text-indigo-500" />
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <Users size={14} /> Community
-              </label>
-              <select
-                value={formData.community}
-                onChange={(e) => setFormData({ ...formData, community: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-purple-500 outline-none transition-all appearance-none"
-              >
-                {COMMUNITIES.map(c => <option key={c} value={c} className="bg-[#111520]">{c}</option>)}
-              </select>
-            </div>
+          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+            {[
+              { label: "Home State", key: "state", options: INDIAN_STATES, icon: MapPin },
+              { label: "Community", key: "community", options: COMMUNITIES, icon: Users },
+              { label: "Course Level", key: "level", options: COURSE_LEVELS, icon: GraduationCap },
+              { label: "Specialization", key: "stream", options: STREAMS, icon: BookOpen },
+              { label: "Annual Income", key: "income", options: INCOME_RANGES, icon: Wallet }
+            ].map((f) => (
+              <div key={f.key} className="space-y-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                  <f.icon size={12} className="text-indigo-500" /> {f.label}
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData[f.key as keyof typeof formData]}
+                    onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })}
+                    className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-indigo-500/50 appearance-none transition-all cursor-pointer"
+                  >
+                    {f.options.map(o => <option key={o} value={o} className="bg-[#05071a]">{o}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" size={16} />
+                </div>
+              </div>
+            ))}
 
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <GraduationCap size={14} /> Course Level
-              </label>
-              <select
-                value={formData.level}
-                onChange={(e) => setFormData({ ...formData, level: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-purple-500 outline-none transition-all appearance-none"
-              >
-                {COURSE_LEVELS.map(l => <option key={l} value={l} className="bg-[#111520]">{l}</option>)}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <BookOpen size={14} /> Stream
-              </label>
-              <select
-                value={formData.stream}
-                onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-purple-500 outline-none transition-all appearance-none"
-              >
-                {STREAMS.map(s => <option key={s} value={s} className="bg-[#111520]">{s}</option>)}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <Wallet size={14} /> Annual Income
-              </label>
-              <select
-                value={formData.income}
-                onChange={(e) => setFormData({ ...formData, income: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-purple-500 outline-none transition-all appearance-none"
-              >
-                {INCOME_RANGES.map(i => <option key={i} value={i} className="bg-[#111520]">{i}</option>)}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <Activity size={14} /> 12th Percentage (%)
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                <Activity size={12} className="text-indigo-500" /> Academic Percentage (%)
               </label>
               <input
                 type="number"
                 placeholder="e.g. 85"
                 value={formData.percentage}
                 onChange={(e) => setFormData({ ...formData, percentage: e.target.value })}
-                className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:border-purple-500 outline-none transition-all"
+                className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/10"
               />
             </div>
 
-            <div className="md:col-span-2 lg:col-span-3 pt-4">
+            <div className="md:col-span-2 lg:col-span-3 pt-6">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-16 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-lg rounded-2xl shadow-xl shadow-purple-500/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+                className="btn-primary w-full h-20 text-xl font-black group"
               >
-                {loading ? <Loader2 className="animate-spin" /> : <Search size={24} />}
-                {loading ? "Searching Scholarships..." : "Find Matching Scholarships"}
+                {loading ? <Loader2 className="animate-spin" size={24} /> : <Zap size={24} className="group-hover:rotate-12 transition-transform" />}
+                {loading ? "Executing Grant Search..." : "Execute AI Search"}
               </button>
             </div>
           </form>
         </motion.div>
 
-        {/* Results Grid */}
+        {/* Results Matrix */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <AnimatePresence>
             {results.map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-[#111520] border border-white/5 rounded-[2rem] p-8 space-y-6 hover:border-purple-500/30 transition-all group"
+                transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white/[0.02] border border-white/5 rounded-[3rem] p-10 space-y-8 hover:border-indigo-500/30 transition-all group backdrop-blur-md relative overflow-hidden"
               >
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-black text-indigo-400 group-hover:text-indigo-300 transition-colors leading-tight">
+                <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                    <Award size={150} className="text-indigo-500" />
+                </div>
+                
+                <div className="flex justify-between items-start gap-6 relative z-10">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black text-indigo-400 group-hover:text-white transition-colors leading-tight tracking-tight">
                       {item.name}
                     </h3>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                      <Building size={14} />
+                    <div className="flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-widest">
+                      <Building size={14} className="text-indigo-500" />
                       {item.provider}
                     </div>
                   </div>
-                  <div className="text-2xl font-black text-emerald-400 tabular-nums">
+                  <div className="text-3xl font-black text-teal-400 tabular-nums shadow-teal-500/20 drop-shadow-xl">
                     {item.amount}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                <div className="flex flex-wrap gap-2 relative z-10">
+                  <span className="px-3 py-1 bg-white/[0.05] border border-white/5 text-white/40 text-[9px] font-black uppercase tracking-widest rounded-lg">
                     {item.category}
                   </span>
-                  <span className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                  <span className="px-3 py-1 bg-white/[0.05] border border-white/5 text-white/40 text-[9px] font-black uppercase tracking-widest rounded-lg">
                     {item.level}
                   </span>
                 </div>
 
-                <p className="text-sm text-slate-400 font-medium italic">
-                  &quot;{item.eligibility}&quot;
-                </p>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 relative z-10">
+                  <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-3">Eligibility Intelligence</p>
+                  <p className="text-white/60 font-medium italic text-base leading-relaxed">
+                    &quot;{item.eligibility}&quot;
+                  </p>
+                </div>
 
-                <div className="flex items-center gap-6 pt-2 border-t border-white/5">
-                  <div className="flex items-center gap-2 text-slate-500 text-sm font-bold">
-                    <Calendar size={16} className="text-purple-500" />
-                    <span>{item.deadline}</span>
+                <div className="flex items-center gap-6 pt-4 border-t border-white/5 relative z-10">
+                  <div className="flex items-center gap-2 text-white/30 text-[10px] font-black uppercase tracking-widest">
+                    <Calendar size={14} className="text-indigo-500" />
+                    Deadline: <span className="text-white">{item.deadline}</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4 relative z-10">
                   <button
                     onClick={() => setExpandedId(expandedId === index ? null : index)}
-                    className="flex items-center justify-between w-full p-4 bg-white/5 rounded-xl text-sm font-bold text-slate-300 hover:bg-white/10 transition-all"
+                    className="flex items-center justify-between w-full h-16 px-8 bg-white/[0.05] rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-white/[0.1] hover:text-white transition-all border border-white/5"
                   >
-                    <span className="flex items-center gap-2"><Info size={16} /> How to Apply</span>
+                    <span className="flex items-center gap-3"><Info size={18} className="text-indigo-500" /> Application Protocol</span>
                     {expandedId === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </button>
                   
@@ -281,32 +254,21 @@ export default function ScholarshipFinder() {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl text-sm text-slate-400 leading-relaxed font-medium">
+                        <div className="p-8 bg-indigo-500/5 border border-indigo-500/10 rounded-[2rem] text-sm text-white/40 leading-relaxed font-medium">
                           {item.how_to_apply}
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  {item.apply_url ? (
-                    <a
-                      href={item.apply_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20"
-                    >
-                      Apply Now <ExternalLink size={18} />
-                    </a>
-                  ) : (
-                    <a
-                      href="https://scholarships.gov.in"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full h-14 bg-white/5 border border-white/10 hover:border-purple-500/50 text-white font-black rounded-xl flex items-center justify-center gap-2 transition-all"
-                    >
-                      Search on NSP Portal <ExternalLink size={18} />
-                    </a>
-                  )}
+                  <a
+                    href={item.apply_url || "https://scholarships.gov.in"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full h-16 btn-primary rounded-2xl flex items-center justify-center gap-3 group text-sm font-black"
+                  >
+                    Execute Application <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </a>
                 </div>
               </motion.div>
             ))}
@@ -314,11 +276,17 @@ export default function ScholarshipFinder() {
         </div>
 
         {results.length === 0 && !loading && (
-          <div className="text-center py-20 space-y-6">
-            <div className="h-24 w-24 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/10 text-slate-700">
-              <Banknote size={48} />
+          <div className="text-center py-32 space-y-8">
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-indigo-500/10 blur-[60px] rounded-full pointer-events-none" />
+              <div className="h-32 w-32 bg-white/[0.03] rounded-[3rem] flex items-center justify-center mx-auto border border-white/5 text-white/10 relative z-10 shadow-2xl">
+                <Banknote size={56} className="animate-pulse" />
+              </div>
             </div>
-            <p className="text-slate-500 font-bold">Search results will appear here</p>
+            <div className="space-y-2">
+              <p className="text-white font-black text-xl tracking-tight">Intelligence Matrix Ready</p>
+              <p className="text-white/20 font-bold uppercase tracking-[0.2em] text-[9px]">Input your parameters to discover matching grants</p>
+            </div>
           </div>
         )}
       </div>

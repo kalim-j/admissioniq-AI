@@ -18,10 +18,16 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Verifying your session...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#05071a]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-400" />
+            </div>
+          </div>
+          <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
+            Verifying your session…
+          </p>
         </div>
       </div>
     );

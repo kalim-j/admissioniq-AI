@@ -1,123 +1,155 @@
+/* ------------------------------------------------------------------
+   Brand Design System – CollegeMatch-AI
+   Dark navy base with indigo/teal accents, glass‑morphism utilities.
+------------------------------------------------------------------ */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+   CSS Variables – defined on :root and .dark for light/dark themes.
+   These match the specification you provided.
+*/
 @layer base {
   :root {
-    --background: 40 14% 97%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 245 42% 51%; /* #534AB7 */
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 161 69% 37%; /* #1D9E75 */
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 161 69% 37%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 245 42% 90%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 245 42% 51%;
-
-    --radius: 0.75rem;
+    --bg-base: #05071a;
+    --bg-deep: #080c24;
+    --bg-mid: #0d1230;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.10);
+    --glass-hover: rgba(255,255,255,0.07);
+    --glass-strong: rgba(255,255,255,0.08);
+    --indigo: #7F77DD;
+    --indigo-light: #a89ef8;
+    --indigo-dark: #534AB7;
+    --teal: #1D9E75;
+    --teal-light: #5DCAA5;
+    --text-primary: rgba(255,255,255,0.95);
+    --text-secondary: rgba(255,255,255,0.60);
+    --text-muted: rgba(255,255,255,0.35);
+    --glow-indigo: 0 0 30px rgba(127,119,221,0.25);
+    --glow-teal: 0 0 30px rgba(29,158,117,0.25);
+    --radius-card: 20px;
+    --radius-btn: 12px;
+    --radius-pill: 100px;
   }
-
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Keep dark palette – same colors used for dark mode */
+    --bg-base: #05071a; /* dark navy */
+    --bg-deep: #080c24;
+    --bg-mid: #0d1230;
+    --text-primary: rgba(255,255,255,0.95);
+    --text-secondary: rgba(255,255,255,0.60);
+    --text-muted: rgba(255,255,255,0.35);
   }
 }
 
+/* Base styles */
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
-    background: transparent;
-    @apply text-foreground;
+    background: var(--bg-base);
+    @apply text-primary font-sans antialiased;
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
 }
 
-html {
-  scroll-behavior: smooth;
+/* Utility – glass‑morphism card */
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+.glass-card:hover {
+  background: var(--glass-hover);
+  border-color: var(--indigo);
+  box-shadow: var(--glow-indigo);
+  transform: translateY(-2px);
 }
 
-/* Remove default button styles for nav links */
-nav button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-  padding: 0;
-}
-
-.college-card-glow {
-  position: relative;
-}
-
-.college-card-glow::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 10%;
-  bottom: 10%;
-  width: 4px;
-  border-radius: 0 4px 4px 0;
-  background: linear-gradient(to bottom, #534AB7, #1D9E75);
-  opacity: 0.8;
-}
-
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
+/* Text gradient utility */
 .text-gradient {
-  background: linear-gradient(135deg, #534AB7 0%, #1D9E75 100%);
+  background: linear-gradient(135deg, var(--indigo-light), var(--teal-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Primary button */
+.btn-primary {
+  background: linear-gradient(135deg, var(--indigo), var(--indigo-dark));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(127,119,221,0.35);
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(127,119,221,0.5);
+}
+
+/* Secondary (ghost) button */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-radius: var(--radius-btn);
+  padding: 12px 24px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--indigo);
+  background: rgba(127,119,221,0.1);
+}
+
+/* Teal button */
+.btn-teal {
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(29,158,117,0.35);
+  transition: all 0.2s ease;
+}
+.btn-teal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(29,158,117,0.5);
+}
+
+/* Badge / pill */
+.badge {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.badge-indigo { background: rgba(127,119,221,0.18); color: var(--indigo-light); border: 1px solid rgba(127,119,221,0.3); }
+.badge-teal   { background: rgba(29,158,117,0.18); color: var(--teal-light); border: 1px solid rgba(29,158,117,0.3); }
+.badge-amber  { background: rgba(186,117,23,0.18); color: #FAC775; border: 1px solid rgba(186,117,23,0.3); }
+.badge-red    { background: rgba(226,75,74,0.18); color: #F09595; border: 1px solid rgba(226,75,74,0.3); }
+.badge-green  { background: rgba(99,153,34,0.18); color: #C0DD97; border: 1px solid rgba(99,153,34,0.3); }
+
+/* Divider */
+.divider { border-top: 1px solid rgba(255,255,255,0.07); margin: 1rem 0; }
+
+/* Keyframe animations */
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes countUp { from { --count:0; } to { --count: var(--target); } }
+

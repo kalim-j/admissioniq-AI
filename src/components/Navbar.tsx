@@ -23,6 +23,7 @@ import {
 } from "./ui/dropdown-menu";
 import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
+import Logo from "./Logo";
 
 const ADMIN_EMAILS = ["kalim.apoffi@gmail.com", "kalimdon07@gmail.com"];
 
@@ -70,84 +71,86 @@ export function Navbar() {
   const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/10 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg font-bold text-lg">
-            CM
-          </div>
-          <span className="text-xl font-bold tracking-tight text-primary">CollegeMatch-AI</span>
-        </Link>
+    <nav className="sticky top-0 z-[100] w-full border-b border-white/5 bg-[#05071a]/85 backdrop-blur-[24px] px-6 h-16 flex items-center justify-between">
+      <Link href="/" className="hover:opacity-90 transition-opacity">
+        <Logo />
+      </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex md:items-center md:space-x-8">
-          {!user ? (
-            <>
-              <button onClick={() => handleNavClick("how-it-works")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">How it works</button>
-              <button onClick={() => handleNavClick("features")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Features</button>
-              <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Contact</Link>
-            </>
-          ) : (
-            <>
-              <Link href="/dashboard" className={cn("text-sm font-medium transition-colors hover:text-primary", pathname === "/dashboard" ? "text-primary" : "text-muted-foreground")}>Dashboard</Link>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary outline-none transition-colors">
-                  Tools <ChevronDown size={14} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-[#111520] border-white/10 text-slate-300 w-56 p-2 rounded-2xl">
-                  {tools.map((tool) => (
-                    <DropdownMenuItem key={tool.href} asChild>
-                      <Link href={tool.href} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all">
-                        <tool.icon size={18} className="text-primary" />
-                        <span className="font-bold">{tool.name}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+      {/* Desktop Navigation */}
+      <div className="hidden lg:flex items-center gap-8">
+        {!user ? (
+          <>
+            <button onClick={() => handleNavClick("how-it-works")} className="text-[13px] font-medium text-white/60 hover:text-white transition-colors">How it works</button>
+            <button onClick={() => handleNavClick("features")} className="text-[13px] font-medium text-white/60 hover:text-white transition-colors">Features</button>
+            <Link href="/contact" className="text-[13px] font-medium text-white/60 hover:text-white transition-colors">Contact</Link>
+          </>
+        ) : (
+          <>
+            <Link href="/dashboard" className={cn("text-[13px] font-medium transition-colors hover:text-white", pathname === "/dashboard" ? "text-white border-b-2 border-[#7F77DD] pb-1" : "text-white/60")}>Dashboard</Link>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-[13px] font-medium text-white/60 hover:text-white outline-none transition-colors">
+                Tools <ChevronDown size={14} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#111520] border-white/10 text-slate-300 w-64 p-2 rounded-2xl backdrop-blur-xl shadow-2xl">
+                {tools.map((tool) => (
+                  <DropdownMenuItem key={tool.href} asChild>
+                    <Link href={tool.href} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all group">
+                      <div className="h-8 w-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                        <tool.icon size={16} />
+                      </div>
+                      <span className="font-bold text-sm">{tool.name}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              <Link href="/history" className={cn("text-sm font-medium transition-colors hover:text-primary", pathname === "/history" ? "text-primary" : "text-muted-foreground")}>History</Link>
-              <Link href="/contact" className={cn("text-sm font-medium transition-colors hover:text-primary", pathname === "/contact" ? "text-primary" : "text-muted-foreground")}>Contact</Link>
-              
-              {isAdmin && (
-                <Link href="/admin" className={cn("text-sm font-bold transition-all px-4 py-1.5 rounded-full relative", pathname === "/admin" ? "bg-red-500 text-white" : "text-red-400 bg-red-500/10 hover:bg-red-500/20")}>
-                  Admin
-                  {pendingLeads > 0 && (
-                    <span className="absolute -top-2 -right-2 h-5 min-w-[20px] px-1 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center animate-pulse border-2 border-[#111520]">
-                      {pendingLeads}
-                    </span>
-                  )}
-                </Link>
-              )}
-            </>
-          )}
+            <Link href="/history" className={cn("text-[13px] font-medium transition-colors hover:text-white", pathname === "/history" ? "text-white border-b-2 border-[#7F77DD] pb-1" : "text-white/60")}>History</Link>
+            <Link href="/contact" className={cn("text-[13px] font-medium transition-colors hover:text-white", pathname === "/contact" ? "text-white border-b-2 border-[#7F77DD] pb-1" : "text-white/60")}>Contact</Link>
+          </>
+        )}
+      </div>
 
-          {user ? (
-            <div className="flex items-center gap-4">
-              <Link href="/profile">
-                <Avatar className="h-9 w-9 border-2 border-primary/20 hover:border-primary transition-all">
-                  <AvatarImage src={profile?.avatarUrl} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                    {profile?.fullName?.charAt(0) || user.email?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
+      <div className="flex items-center gap-4">
+        {user ? (
+          <div className="flex items-center gap-4">
+            {isAdmin && (
+              <Link href="/admin" className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider relative">
+                Admin
+                {pendingLeads > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 h-4 min-w-[16px] px-1 bg-amber-500 text-white text-[8px] font-black rounded-full flex items-center justify-center animate-pulse border border-[#05071a]">
+                    {pendingLeads}
+                  </span>
+                )}
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                <LogOut className="h-4 w-4 mr-2" /> Logout
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link href="/login"><Button variant="ghost" size="sm" className="font-bold">Login</Button></Link>
-              <Link href="/register"><Button size="sm" className="bg-primary shadow-lg shadow-primary/20 font-black">Sign Up</Button></Link>
-            </div>
-          )}
-        </div>
+            )}
+            <Link href="/profile" className="flex items-center gap-3 group">
+              <div className="flex flex-col items-end hidden sm:flex">
+                <span className="text-[12px] font-bold text-white leading-tight">{profile?.fullName?.split(' ')[0] || user.email?.split('@')[0]}</span>
+                <span className="text-[10px] text-white/40 leading-tight">Student Profile</span>
+              </div>
+              <Avatar className="h-10 w-10 border border-white/10 group-hover:border-indigo-500/50 transition-all">
+                <AvatarImage src={profile?.avatarUrl} />
+                <AvatarFallback className="bg-indigo-500/10 text-indigo-400 font-bold">
+                  {profile?.fullName?.charAt(0) || user.email?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+            <button onClick={handleSignOut} className="p-2 text-white/40 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
+              <LogOut size={20} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="btn-ghost !py-2 !px-5 !text-[13px]">Login</Link>
+            <Link href="/register" className="btn-primary !py-2 !px-5 !text-[13px]">Get Started</Link>
+          </div>
+        )}
 
-        {/* Mobile Menu Button */}
-        <button className="md:hidden p-2 text-primary" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        {/* Mobile Toggle */}
+        <button className="lg:hidden p-2 text-white" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 

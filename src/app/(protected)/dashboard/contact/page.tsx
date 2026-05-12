@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, MessageSquare, Send, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { 
+  Mail, MessageSquare, Send, CheckCircle2, 
+  Loader2, Sparkles, ShieldCheck, Zap,
+  ArrowRight, Phone, Target
+} from "lucide-react";
 import { toast } from "sonner";
-
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 
 export default function ContactPage() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -22,12 +26,9 @@ export default function ContactPage() {
     setMounted(true);
   }, []);
 
-
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile) return;
+    if (!profile && !user) return;
     setSending(true);
 
     try {
@@ -42,137 +43,167 @@ export default function ContactPage() {
 
       if (error) throw error;
       setSuccess(true);
-      toast.success("Message sent successfully!");
+      toast.success("Intelligence transmission successful!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to send message");
+      toast.error(error.message || "Transmission failure. Please retry.");
     } finally {
       setSending(false);
     }
   };
 
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#05071a] flex items-center justify-center">
+      <Loader2 className="h-10 w-10 text-indigo-400 animate-spin" />
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#0a0d14] p-4 md:p-8 flex items-center justify-center">
-      <div className="max-w-4xl w-full">
+    <div className="min-h-screen bg-[#05071a] text-white relative overflow-hidden selection:bg-indigo-500/30 flex items-center justify-center p-6">
+      {/* Background Ambience */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-500/5 rounded-full blur-[150px] pointer-events-none" />
+      </div>
+
+      <div className="max-w-4xl w-full relative z-10">
         <AnimatePresence mode="wait">
           {!success ? (
             <motion.div
               key="contact-form"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#111520] border border-white/10 rounded-[3.5rem] p-10 md:p-16 shadow-[0_48px_120px_rgba(0,0,0,0.6)] relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              className="bg-white/[0.02] border border-white/5 rounded-[4rem] p-10 md:p-16 shadow-[0_50px_100px_rgba(0,0,0,0.6)] relative overflow-hidden backdrop-blur-3xl"
             >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500" />
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-500" />
               
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-                <div className="space-y-2">
-                  <h1 className="text-4xl md:text-5xl font-black text-white font-syne">Get in Touch</h1>
-                  <p className="text-slate-500 font-bold uppercase tracking-widest text-sm mt-1">Direct support for admission & counseling</p>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                    <ShieldCheck size={14} className="text-indigo-400" />
+                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Support Protocol</span>
+                  </div>
+                  <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-tight">Get in Touch</h1>
+                  <p className="text-white/30 font-bold uppercase tracking-[0.2em] text-[10px]">Direct line to admission intelligence & counseling experts</p>
                 </div>
-                <div className="h-16 w-16 bg-white/5 rounded-2xl flex items-center justify-center text-purple-400">
-                  <MessageSquare size={32} />
+                <div className="h-20 w-20 bg-white/[0.05] border border-white/10 rounded-[2rem] flex items-center justify-center text-indigo-400 shadow-2xl">
+                  <MessageSquare size={36} />
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Your Name</label>
+              <form onSubmit={handleSubmit} className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                          <Target size={12} className="text-indigo-500" /> Your Identity
+                        </label>
                         <input 
                             type="text" 
                             disabled 
-                            value={profile?.fullName || ""}
-                            className="w-full h-14 bg-white/[0.03] border border-white/5 rounded-xl px-6 text-slate-400 font-bold"
+                            value={profile?.fullName || user?.displayName || "Student User"}
+                            className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white/40 font-bold cursor-not-allowed"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                          <Mail size={12} className="text-indigo-500" /> Secure Email
+                        </label>
                         <input 
                             type="text" 
                             disabled 
-                            value={profile?.email || ""}
-                            className="w-full h-14 bg-white/[0.03] border border-white/5 rounded-xl px-6 text-slate-400 font-bold"
+                            value={profile?.email || user?.email || ""}
+                            className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white/40 font-bold cursor-not-allowed"
                         />
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Subject</label>
-                    <select 
-                        value={formData.subject}
-                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                        className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-6 text-white font-bold outline-none focus:border-purple-500 appearance-none cursor-pointer"
-                    >
-                        <option className="bg-[#0a0d14] text-white">General Inquiry</option>
-                        <option className="bg-[#0a0d14] text-white">Direct Admission Help</option>
-                        <option className="bg-[#0a0d14] text-white">JEE/TNEA Counseling</option>
-                        <option className="bg-[#0a0d14] text-white">Bug Report</option>
-                        <option className="bg-[#0a0d14] text-white">Other</option>
-                    </select>
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                      <Zap size={12} className="text-indigo-500" /> Intelligence Subject
+                    </label>
+                    <div className="relative">
+                      <select 
+                          value={formData.subject}
+                          onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                          className="w-full h-16 bg-white/[0.05] border border-white/10 rounded-2xl px-6 text-white font-bold outline-none focus:border-indigo-500/50 appearance-none cursor-pointer transition-all"
+                      >
+                          <option className="bg-[#05071a] text-white">General Inquiry</option>
+                          <option className="bg-[#05071a] text-white">Direct Admission Help</option>
+                          <option className="bg-[#05071a] text-white">JEE/TNEA Counseling</option>
+                          <option className="bg-[#05071a] text-white">Bug Report</option>
+                          <option className="bg-[#05071a] text-white">Other</option>
+                      </select>
+                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" size={18} />
+                    </div>
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Message</label>
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                      <MessageSquare size={12} className="text-indigo-500" /> Transmission Message
+                    </label>
                     <textarea 
                         required
                         rows={5}
                         value={formData.message}
                         onChange={(e) => setFormData({...formData, message: e.target.value})}
-                        placeholder="How can we help you today?"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-white outline-none focus:border-purple-500 transition-all font-medium resize-none"
+                        placeholder="Define your requirements here…"
+                        className="w-full bg-white/[0.05] border border-white/10 rounded-[2rem] p-8 text-white outline-none focus:border-indigo-500/30 transition-all font-medium resize-none placeholder:text-white/10"
                     />
                 </div>
 
                 <button 
                     disabled={sending}
-                    className="w-full h-16 bg-gradient-to-br from-[#7c5cfc] to-[#6d28d9] rounded-2xl text-white font-black text-lg shadow-2xl shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3"
+                    className="btn-primary w-full h-20 text-xl font-black group"
                 >
-                    {sending ? <Loader2 className="animate-spin" /> : <Send size={20} />}
-                    {sending ? "Sending Message..." : "Submit Inquiry"}
+                    {sending ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+                    {sending ? "Transmitting Intelligence…" : "Execute Submission"}
                 </button>
               </form>
             </motion.div>
           ) : (
             <motion.div
               key="contact-success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#111520] border border-white/10 rounded-[3.5rem] p-20 text-center space-y-8 shadow-[0_48px_120px_rgba(0,0,0,0.6)] relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              className="bg-white/[0.02] border border-white/5 rounded-[4rem] p-16 md:p-24 text-center space-y-10 shadow-[0_50px_150px_rgba(0,0,0,0.6)] relative overflow-hidden backdrop-blur-3xl"
             >
-                <div className="absolute inset-0 pointer-events-none">
-                    {mounted && [...Array(20)].map((_, i) => (
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    {mounted && [...Array(30)].map((_, i) => (
                         <motion.div
                             key={i}
-                            className="absolute h-2 w-2 rounded-full bg-purple-500"
+                            className="absolute h-1.5 w-1.5 rounded-full bg-indigo-500/40"
                             initial={{ top: '50%', left: '50%' }}
                             animate={{ 
                                 top: `${Math.random() * 100}%`, 
                                 left: `${Math.random() * 100}%`,
                                 opacity: [0, 1, 0],
-                                scale: [0, 1.5, 0]
+                                scale: [0, 2, 0]
                             }}
-                            transition={{ duration: 2, repeat: Infinity, delay: i * 0.1 }}
+                            transition={{ duration: 3, repeat: Infinity, delay: i * 0.1, ease: "circOut" }}
                         />
                     ))}
                 </div>
 
-                <div className="h-32 w-32 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center text-emerald-400 mx-auto shadow-2xl border border-emerald-500/20 relative">
-                    <CheckCircle2 size={64} className="relative z-10" />
-                    <Sparkles className="absolute -top-4 -right-4 text-amber-400 animate-pulse" size={32} />
+                <div className="relative inline-block">
+                  <div className="absolute inset-0 bg-teal-500/20 blur-[60px] rounded-full pointer-events-none" />
+                  <div className="h-32 w-32 bg-teal-500/10 rounded-[3rem] border border-teal-500/20 flex items-center justify-center text-teal-400 mx-auto shadow-2xl relative z-10">
+                    <CheckCircle2 size={64} className="animate-in zoom-in duration-500" />
+                  </div>
+                  <Sparkles className="absolute -top-6 -right-6 text-amber-400 animate-pulse" size={40} />
                 </div>
                 
-                <div className="space-y-4">
-                    <h2 className="text-5xl font-black text-white font-syne">Inquiry Sent!</h2>
-                    <p className="text-slate-500 font-bold text-lg max-w-sm mx-auto leading-relaxed">
-                        Thank you for reaching out. Our CollegeMatch-AI expert will contact you within <span className="text-purple-400">24 hours</span>.
+                <div className="space-y-4 relative z-10">
+                    <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter">Inquiry Sent</h2>
+                    <p className="text-white/40 font-bold text-lg max-w-sm mx-auto leading-relaxed">
+                        Data transmission complete. Our CollegeMatch-AI specialists will reach out via secure channel within <span className="text-indigo-400">24 hours</span>.
                     </p>
                 </div>
 
                 <button 
                     onClick={() => setSuccess(false)}
-                    className="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+                    className="inline-flex items-center gap-3 px-12 py-5 bg-white/[0.05] border border-white/10 rounded-2xl text-white/30 font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white/[0.1] hover:text-white transition-all relative z-10"
                 >
-                    Send another message
+                    Initialize New Transmission
                 </button>
             </motion.div>
           )}
