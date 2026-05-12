@@ -10,7 +10,7 @@ import {
   Search, Filter, Calendar, MapPin, Phone, 
   ExternalLink, CheckCircle2, XCircle, Clock, 
   ChevronRight, Loader2, LogOut, MoreVertical,
-  Briefcase, GraduationCap, WhatsApp, MessageCircle,
+  Briefcase, GraduationCap, MessageCircle,
   FileText, Check, Trash2, BadgeAlert
 } from "lucide-react";
 import { db } from "@/lib/firebase";
