@@ -181,7 +181,7 @@ export default function AdminDashboard() {
             <div className="h-10 w-10 rounded-full bg-red-500 flex items-center justify-center font-black text-white">K</div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">Kalim Admin</p>
-              <p className="text-[10px] text-slate-500 truncate">{ADMIN_EMAIL}</p>
+              <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
             </div>
           </div>
         </div>
