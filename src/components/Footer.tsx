@@ -1,9 +1,17 @@
+"use client";
+
 import { Phone, Mail, MapPin, Instagram, Twitter, Linkedin } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isPageHidden = pathname === "/admin" || pathname?.startsWith("/admin/");
+
+  if (isPageHidden) return null;
+
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-8">
+    <footer className="bg-[#0a0d14] border-t border-white/5 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-1">
@@ -34,15 +42,15 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-6">Contact Info</h4>
             <ul className="space-y-4">
               <li className="flex items-center text-gray-400">
-                <Phone className="h-5 w-5 mr-3 text-primary" />
+                <Phone className="h-5 w-5 mr-3 text-purple-500" />
                 +91 9363554551
               </li>
               <li className="flex items-center text-gray-400">
-                <Mail className="h-5 w-5 mr-3 text-primary" />
+                <Mail className="h-5 w-5 mr-3 text-purple-500" />
                 info@collegematch-ai.com
               </li>
               <li className="flex items-center text-gray-400">
-                <MapPin className="h-5 w-5 mr-3 text-primary" />
+                <MapPin className="h-5 w-5 mr-3 text-purple-500" />
                 Chennai, Tamil Nadu, India
               </li>
             </ul>
@@ -57,9 +65,9 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-sm">
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-sm">
           <p>© {new Date().getFullYear()} CollegeMatch-AI. All rights reserved.</p>
-          <p className="font-medium text-primary/80">Inspiring ambition since 2024</p>
+          <p className="font-medium text-purple-400">Inspiring ambition since 2024</p>
         </div>
       </div>
     </footer>

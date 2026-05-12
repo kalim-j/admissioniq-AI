@@ -32,14 +32,17 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading) {
-      if (!user || user.email !== "kalimdon07@gmail.com") {
-        router.push("/dashboard");
-        return;
+    const init = async () => {
+      if (!authLoading) {
+        if (!user || user.email !== "kalimdon07@gmail.com") {
+          router.push("/dashboard");
+          return;
+        }
+        await fetchData();
+        setLoading(false);
       }
-      fetchData();
-      setLoading(false);
-    }
+    };
+    init();
   }, [user, authLoading]);
 
   const fetchData = async () => {
@@ -295,10 +298,12 @@ export default function AdminPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                            {usersList.filter(u => 
-                                u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                u.email?.toLowerCase().includes(searchQuery.toLowerCase())
-                            ).map((u, i) => {
+                            {usersList.filter(u => {
+                                const search = searchQuery.toLowerCase();
+                                const name = (u.fullName || u.full_name || "").toLowerCase();
+                                const email = (u.email || "").toLowerCase();
+                                return name.includes(search) || email.includes(search);
+                            }).map((u, i) => {
                                 const lastActiveDate = u.updatedAt?.seconds ? new Date(u.updatedAt.seconds * 1000) : new Date(u.updatedAt || Date.now());
                                 const isActive = new Date().getTime() - lastActiveDate.getTime() < 7 * 24 * 60 * 60 * 1000;
                                 const joinDate = u.createdAt?.seconds ? new Date(u.createdAt.seconds * 1000) : new Date(u.createdAt || Date.now());
@@ -308,10 +313,10 @@ export default function AdminPage() {
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-10 w-10 rounded-full bg-purple-500/20 border border-purple-500/20 flex items-center justify-center font-black text-purple-400">
-                                                    {u.fullName?.[0] || 'U'}
+                                                    {(u.fullName || u.full_name || 'U')[0]}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-white group-hover:text-purple-400 transition-colors">{u.fullName}</p>
+                                                    <p className="font-bold text-white group-hover:text-purple-400 transition-colors">{u.fullName || u.full_name || "Unknown User"}</p>
                                                     <p className="text-xs text-slate-500">{u.email}</p>
                                                 </div>
                                             </div>
@@ -319,7 +324,9 @@ export default function AdminPage() {
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-2">
                                                 <MapPin size={14} className="text-slate-600" />
-                                                <span className="text-sm font-medium">{u.city}, {u.state}</span>
+                                                <span className="text-sm font-medium">
+                                                    {u.city || u.state ? `${u.city || ''}${u.city && u.state ? ', ' : ''}${u.state || ''}` : 'Not Set'}
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-5 text-sm">{joinDate.toLocaleDateString()}</td>
@@ -417,9 +424,9 @@ export default function AdminPage() {
 
                         <div className="flex flex-col items-center text-center mb-10">
                             <div className="h-24 w-24 rounded-[2rem] bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center font-black text-3xl text-white shadow-2xl shadow-purple-500/40 mb-6">
-                                {selectedUser.full_name?.[0]}
+                                { (selectedUser.fullName || selectedUser.full_name || "U")[0] }
                             </div>
-                            <h2 className="text-3xl font-black text-white font-syne">{selectedUser.full_name}</h2>
+                            <h2 className="text-3xl font-black text-white font-syne">{selectedUser.fullName || selectedUser.full_name || "Unknown User"}</h2>
                             <p className="text-purple-400 font-bold">{selectedUser.email}</p>
                             <div className="mt-4 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black text-emerald-400 uppercase tracking-widest">
                                 Profile Active

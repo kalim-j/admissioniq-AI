@@ -81,6 +81,8 @@ export const metadata: Metadata = {
   }
 };
 
+import Footer from "@/components/Footer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -103,7 +105,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={cn(jakarta.variable, syne.variable, dmSans.variable, "min-h-screen font-sans antialiased")}>
+      <body className={cn(jakarta.variable, syne.variable, dmSans.variable, "min-h-screen bg-[#0a0d14] font-sans antialiased")}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -115,16 +117,7 @@ export default function RootLayout({
             <main className="flex-1">
               {children}
             </main>
-            <footer className="border-t py-6 md:py-0">
-              <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row px-4">
-                <p className="text-sm text-muted-foreground">
-                  &copy; {new Date().getFullYear()} CollegeMatch-AI. All rights reserved.
-                </p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="font-medium text-primary">Inspiring ambition since 2024</span>
-                </div>
-              </div>
-            </footer>
+            <Footer />
           </div>
           <Toaster position="top-center" richColors />
         </Providers>
