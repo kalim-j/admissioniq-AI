@@ -11,7 +11,8 @@ import {
   Calendar, Mail, User, LogOut, ChevronRight, Loader2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { collection, getDocs, query, orderBy, limit, where, Timestamp } from "firebase/firestore";
+import { toast } from "sonner";
+import { collection, getDocs, getDoc, doc, query, orderBy, limit, where, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import { 
@@ -49,14 +50,23 @@ export default function AdminPage() {
     try {
       console.log("Fetching admin data from Firestore...");
       // 1. Fetch Users from Firestore
+      console.log("Using DB instance:", db.app.name);
       const usersSnap = await getDocs(collection(db, "users"));
-      console.log("Users found in Firestore:", usersSnap.size);
+      console.log("Firestore Response size:", usersSnap.size);
+      console.log("Firestore Response empty:", usersSnap.empty);
       
       const usersData = usersSnap.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+      console.log("Mapped Users Data length:", usersData.length);
       setUsersList(usersData);
+
+      // Verify connection by checking current user
+      if (user) {
+        const selfDoc = await getDoc(doc(db, "users", user.uid));
+        console.log("Admin self-check in Firestore:", selfDoc.exists(), selfDoc.data());
+      }
 
       // 2. Fetch Contact Submissions (Messages) from Supabase
       const { data: submissions, error: subError } = await supabase
@@ -106,8 +116,46 @@ export default function AdminPage() {
         ]
       });
 
-    } catch (error) {
+      if (usersData.length === 0) {
+        console.warn("No users found in Firestore 'users' collection. Checking Supabase 'profiles'...");
+        // Fallback to Supabase users if Firestore is empty (during migration)
+        try {
+          const { data: supabaseUsers, error: sbError } = await supabase
+            .from('profiles')
+            .select('*');
+          
+          if (!sbError && supabaseUsers && supabaseUsers.length > 0) {
+            console.log("Found users in Supabase profiles table:", supabaseUsers.length);
+            const mappedSupabaseUsers = supabaseUsers.map(u => ({
+              id: u.id || u.uid,
+              fullName: u.full_name || u.fullName || "Supabase User",
+              email: u.email,
+              city: u.city || "Unknown",
+              state: u.state || "Unknown",
+              createdAt: u.created_at ? { seconds: Math.floor(new Date(u.created_at).getTime() / 1000) } : null,
+              updatedAt: u.updated_at ? { seconds: Math.floor(new Date(u.updated_at).getTime() / 1000) } : null
+            }));
+            setUsersList(mappedSupabaseUsers);
+            setStats((prev: any) => ({
+              ...prev,
+              total_users: mappedSupabaseUsers.length
+            }));
+            toast.info(`Note: Displaying ${mappedSupabaseUsers.length} users from Supabase legacy database.`);
+          } else if (sbError) {
+             console.error("Supabase Fallback Error:", sbError);
+          }
+        } catch (sbErr) {
+          console.error("Supabase Fallback Catch:", sbErr);
+        }
+      }
+
+    } catch (error: any) {
       console.error("Error fetching admin data:", error);
+      if (error.code === 'permission-denied') {
+        toast.error("Firestore Error: Permission Denied. You may need to update your Security Rules to allow 'list' on the users collection.");
+      } else {
+        toast.error(`Admin Fetch Error: ${error.message}`);
+      }
     }
   };
 
