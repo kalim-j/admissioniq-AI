@@ -62,6 +62,14 @@ export interface College {
   courses?: string[];
   naac_grade?: string;
   fees_approx?: string;
+  district?: string;
+  fees_structure?: {
+    ug_annual: number;
+    ug_total: number;
+    pg_annual?: number;
+    pg_total?: number;
+    hostel_annual?: number;
+  };
 }
 
 export interface InterviewSession {

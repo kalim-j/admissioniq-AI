@@ -52,6 +52,8 @@ export default function InterviewPage() {
 
   const [colleges, setColleges] = useState<College[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [noCollegesInDistrict, setNoCollegesInDistrict] = useState(false);
+  const [searchScope, setSearchScope] = useState<string>("");
 
   useEffect(() => {
     if (!loading && !user) router.push("/login");
@@ -89,17 +91,32 @@ export default function InterviewPage() {
     router.push(`/colleges/${collegeId}`);
   };
 
-  const handleFinish = async () => {
+  const handleFinish = async (searchOtherStates = false) => {
     setAnalyzing(true);
+    setNoCollegesInDistrict(false);
     try {
       const res = await fetch("/api/groq-suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentProfile: formData }),
+        body: JSON.stringify({ 
+          studentProfile: formData,
+          searchOtherStates 
+        }),
       });
       
-      if (!res.ok) throw new Error("Groq API call failed");
-      const collegesData = await res.json();
+      if (!res.ok) throw new Error("College matching failed");
+      const data = await res.json();
+
+      // Check if no colleges found in district
+      if (data.noCollegesInDistrict) {
+        setNoCollegesInDistrict(true);
+        setAnalyzing(false);
+        toast.error(`No colleges found in ${formData.district} district`);
+        return;
+      }
+
+      const collegesData = data.colleges || [];
+      setSearchScope(data.searchScope || "district");
 
       if (user && Array.isArray(collegesData) && collegesData.length > 0) {
         await addDoc(collection(db, "interviews", user.uid, "sessions"), {
@@ -109,6 +126,7 @@ export default function InterviewPage() {
           results: collegesData,
           topCollege: collegesData[0]?.name ?? 'Unknown',
           totalResults: collegesData.length,
+          searchScope: data.searchScope
         });
       }
 
@@ -117,7 +135,7 @@ export default function InterviewPage() {
 
       setColleges(collegesData);
       setStep(10); 
-      toast.success("AI Analysis Complete!");
+      toast.success(`Found ${collegesData.length} matching colleges!`);
     } catch (error: any) {
       console.error("Analysis error:", error);
       toast.error("Something went wrong. Please try again.");
@@ -540,36 +558,74 @@ export default function InterviewPage() {
               <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter">Ready for Analysis?</h2>
               <p className="text-white/30 font-bold uppercase tracking-[0.2em] text-[10px]">Step 9: Final predictive processing</p>
             </div>
-            <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/5 rounded-[3.5rem] p-14 text-center space-y-8 relative overflow-hidden shadow-2xl">
+            
+            {noCollegesInDistrict ? (
+              <div className="bg-amber-500/10 backdrop-blur-2xl border border-amber-500/20 rounded-[3.5rem] p-14 text-center space-y-8 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 to-orange-500" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-amber-500/20 blur-[60px] rounded-full pointer-events-none" />
+                  <MapPin className="h-24 w-24 text-amber-400 mx-auto relative z-10" />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-black text-white tracking-tight">No Colleges Found in {formData.district}</h3>
+                  <p className="text-white/60 font-medium leading-relaxed max-w-md mx-auto text-base">
+                    We couldn't find any colleges matching your criteria in <span className="text-amber-400 font-bold">{formData.district} district</span>. 
+                    Would you like to explore colleges from other states?
+                  </p>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <button 
+                    className="btn-primary h-20 text-xl group flex items-center justify-center gap-4" 
+                    onClick={() => handleFinish(true)}
+                    disabled={analyzing}
+                  >
+                    {analyzing ? (
+                      <Loader2 className="animate-spin" size={28} />
+                    ) : (
+                      <Target size={28} className="group-hover:scale-110 transition-transform" />
+                    )}
+                    <span>{analyzing ? "Searching All States..." : "Search Colleges from Other States"}</span>
+                  </button>
+                  <button 
+                    onClick={handleBack} 
+                    className="btn-ghost h-16 text-lg font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={24} /> Change District
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/5 rounded-[3.5rem] p-14 text-center space-y-8 relative overflow-hidden shadow-2xl">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-teal-500" />
                 <div className="relative">
                   <div className="absolute inset-0 bg-indigo-500/20 blur-[60px] rounded-full pointer-events-none" />
                   <Sparkles className="h-24 w-24 text-indigo-400 mx-auto animate-pulse relative z-10" />
                 </div>
                 <div className="space-y-3">
-                    <h3 className="text-3xl font-black text-white tracking-tight">AI Engine Primed</h3>
-                    <p className="text-white/40 font-medium leading-relaxed max-w-xs mx-auto text-sm">
-                        Our advanced matching engine is ready to process your academic profile against 2,500+ top institutions.
-                    </p>
+                  <h3 className="text-3xl font-black text-white tracking-tight">AI Engine Primed</h3>
+                  <p className="text-white/40 font-medium leading-relaxed max-w-xs mx-auto text-sm">
+                    Our advanced matching engine is ready to process your academic profile against real colleges with verified fee structures.
+                  </p>
                 </div>
                 <div className="flex gap-4">
                   <button onClick={handleBack} className="btn-ghost flex-1 h-20 text-lg font-black uppercase tracking-widest flex items-center justify-center gap-2">
                     <ChevronLeft size={24} /> Back
                   </button>
                   <button 
-                      className="btn-primary flex-[3] h-20 text-2xl group flex items-center justify-center gap-4" 
-                      onClick={handleFinish}
-                      disabled={analyzing}
+                    className="btn-primary flex-[3] h-20 text-2xl group flex items-center justify-center gap-4" 
+                    onClick={() => handleFinish(false)}
+                    disabled={analyzing}
                   >
-                      {analyzing ? (
-                        <Loader2 className="animate-spin" size={32} />
-                      ) : (
-                        <Zap size={28} className="group-hover:rotate-12 transition-transform" />
-                      )}
-                      <span>{analyzing ? "AI is Analyzing Profile..." : "Execute AI Search"}</span>
+                    {analyzing ? (
+                      <Loader2 className="animate-spin" size={32} />
+                    ) : (
+                      <Zap size={28} className="group-hover:rotate-12 transition-transform" />
+                    )}
+                    <span>{analyzing ? "AI is Analyzing Profile..." : "Execute AI Search"}</span>
                   </button>
                 </div>
-            </div>
+              </div>
+            )}
           </div>
         );
       case 10:
@@ -584,6 +640,17 @@ export default function InterviewPage() {
               <p className="text-white/40 font-bold uppercase tracking-[0.3em] text-[11px] leading-relaxed max-w-xl mx-auto">
                 Based on your <span className="text-teal-400">{formData.courseLevel} {formData.stream}</span> profile, we discovered <span className="text-indigo-400">{colleges.length} matches</span> tailored to your performance.
               </p>
+              
+              {searchScope && (
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500/10 border border-amber-500/20">
+                  <MapPin size={16} className="text-amber-400" />
+                  <span className="text-[11px] font-black text-amber-300 uppercase tracking-widest">
+                    {searchScope === "district" && `Showing colleges in ${formData.district} district`}
+                    {searchScope === "state" && `Showing colleges in ${formData.state} state`}
+                    {searchScope === "all_states" && "Showing colleges from all states"}
+                  </span>
+                </div>
+              )}
               
               <div className="pt-8 flex flex-col md:flex-row justify-center gap-4">
                 <button
@@ -640,10 +707,21 @@ export default function InterviewPage() {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 mb-8">
+                      <div className="flex flex-wrap gap-2 mb-6">
                         {[college.type, college.level || "UG", `Rank #${college.nirf_rank || "N/A"}`].map((tag, i) => (
                           <span key={i} className="px-3 py-1 bg-white/[0.05] rounded-lg text-[9px] font-black text-white/40 border border-white/5 uppercase tracking-wider">{tag}</span>
                         ))}
+                      </div>
+
+                      {/* Fee Structure Display */}
+                      <div className="mb-6 p-6 rounded-[2rem] bg-emerald-500/[0.05] border border-emerald-500/10">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[9px] font-black text-emerald-400/50 uppercase tracking-widest mb-1">Total Fees</p>
+                            <p className="text-2xl font-black text-emerald-400">{college.fees_approx || "Contact College"}</p>
+                          </div>
+                          <Wallet size={32} className="text-emerald-500/20" />
+                        </div>
                       </div>
 
                       <div className="p-8 rounded-[2rem] bg-indigo-500/[0.03] border border-indigo-500/10 mb-10 flex-1 relative overflow-hidden group/box">
