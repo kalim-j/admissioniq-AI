@@ -900,6 +900,493 @@ export const medicalColleges: CollegeData[] = [
     seats: 150,
     nirf_rank: 105,
     website: "https://www.karurmedicalcollege.edu.in"
+  },
+
+  // ============ ADDITIONAL MEDICAL COLLEGES ACROSS INDIA ============
+  
+  // Tamil Nadu - Chennai
+  {
+    id: 2034,
+    name: "Stanley Medical College",
+    location: "Old Jail Road",
+    district: "Chennai",
+    state: "Tamil Nadu",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 8500,
+      ug_total: 42500,
+      pg_annual: 12000,
+      pg_total: 36000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 590,
+    cutoff_obc: 1150,
+    cutoff_sc: 2400,
+    cutoff_st: 3300,
+    avg_package_lpa: 8.2,
+    max_package_lpa: 15.5,
+    seats: 250,
+    nirf_rank: 42,
+    website: "https://www.tnmgrmu.ac.in/stanley"
+  },
+  {
+    id: 2035,
+    name: "Kilpauk Medical College",
+    location: "Kilpauk",
+    district: "Chennai",
+    state: "Tamil Nadu",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A",
+    courses: ["MBBS", "MD", "MS"],
+    fees_structure: {
+      ug_annual: 8500,
+      ug_total: 42500,
+      pg_annual: 12000,
+      pg_total: 36000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 610,
+    cutoff_obc: 1200,
+    cutoff_sc: 2500,
+    cutoff_st: 3400,
+    avg_package_lpa: 7.8,
+    max_package_lpa: 14.8,
+    seats: 150,
+    nirf_rank: 58,
+    website: "https://www.kmckilpauk.edu.in"
+  },
+
+  // Tamil Nadu - Madurai
+  {
+    id: 2036,
+    name: "Madurai Medical College",
+    location: "Alwarpuram",
+    district: "Madurai",
+    state: "Tamil Nadu",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 8500,
+      ug_total: 42500,
+      pg_annual: 12000,
+      pg_total: 36000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 595,
+    cutoff_obc: 1170,
+    cutoff_sc: 2450,
+    cutoff_st: 3350,
+    avg_package_lpa: 8.0,
+    max_package_lpa: 15.2,
+    seats: 200,
+    nirf_rank: 48,
+    website: "https://www.maduraimedicalcollege.edu.in"
+  },
+
+  // Tamil Nadu - Salem
+  {
+    id: 2037,
+    name: "Government Mohan Kumaramangalam Medical College",
+    location: "Salem",
+    district: "Salem",
+    state: "Tamil Nadu",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A",
+    courses: ["MBBS", "MD", "MS"],
+    fees_structure: {
+      ug_annual: 8500,
+      ug_total: 42500,
+      pg_annual: 12000,
+      pg_total: 36000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 620,
+    cutoff_obc: 1220,
+    cutoff_sc: 2550,
+    cutoff_st: 3450,
+    avg_package_lpa: 7.5,
+    max_package_lpa: 14.2,
+    seats: 150,
+    nirf_rank: 65,
+    website: "https://www.gmkmch.in"
+  },
+
+  // Tamil Nadu - Trichy
+  {
+    id: 2038,
+    name: "K.A.P. Viswanatham Government Medical College",
+    location: "Tiruchirappalli",
+    district: "Tiruchirappalli",
+    state: "Tamil Nadu",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A",
+    courses: ["MBBS", "MD", "MS"],
+    fees_structure: {
+      ug_annual: 8500,
+      ug_total: 42500,
+      pg_annual: 12000,
+      pg_total: 36000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 615,
+    cutoff_obc: 1210,
+    cutoff_sc: 2520,
+    cutoff_st: 3420,
+    avg_package_lpa: 7.6,
+    max_package_lpa: 14.5,
+    seats: 150,
+    nirf_rank: 62,
+    website: "https://www.kapvgmc.org"
+  },
+
+  // Tamil Nadu - Vellore
+  {
+    id: 2039,
+    name: "Government Vellore Medical College",
+    location: "Adukkamparai",
+    district: "Vellore",
+    state: "Tamil Nadu",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A",
+    courses: ["MBBS", "MD", "MS"],
+    fees_structure: {
+      ug_annual: 8500,
+      ug_total: 42500,
+      pg_annual: 12000,
+      pg_total: 36000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 625,
+    cutoff_obc: 1230,
+    cutoff_sc: 2570,
+    cutoff_st: 3470,
+    avg_package_lpa: 7.4,
+    max_package_lpa: 14.0,
+    seats: 150,
+    nirf_rank: 68,
+    website: "https://www.gvmc.ac.in"
+  },
+
+  // Maharashtra - Mumbai
+  {
+    id: 2040,
+    name: "Grant Medical College and Sir JJ Hospital",
+    location: "Byculla",
+    district: "Mumbai City",
+    state: "Maharashtra",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A++",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 12500,
+      ug_total: 62500,
+      pg_annual: 18000,
+      pg_total: 54000,
+      hostel_annual: 20000
+    },
+    cutoff_general: 570,
+    cutoff_obc: 1080,
+    cutoff_sc: 2250,
+    cutoff_st: 3100,
+    avg_package_lpa: 9.0,
+    max_package_lpa: 16.5,
+    seats: 250,
+    nirf_rank: 35,
+    website: "https://www.grantmedicalcollege.com"
+  },
+  {
+    id: 2041,
+    name: "Lokmanya Tilak Municipal Medical College (Sion Hospital)",
+    location: "Sion",
+    district: "Mumbai City",
+    state: "Maharashtra",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS", "DM"],
+    fees_structure: {
+      ug_annual: 12500,
+      ug_total: 62500,
+      pg_annual: 18000,
+      pg_total: 54000,
+      hostel_annual: 20000
+    },
+    cutoff_general: 585,
+    cutoff_obc: 1120,
+    cutoff_sc: 2320,
+    cutoff_st: 3180,
+    avg_package_lpa: 8.8,
+    max_package_lpa: 16.2,
+    seats: 200,
+    nirf_rank: 38,
+    website: "https://www.ltmmc.com"
+  },
+
+  // Maharashtra - Pune
+  {
+    id: 2042,
+    name: "Armed Forces Medical College (AFMC)",
+    location: "Solapur Road",
+    district: "Pune",
+    state: "Maharashtra",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A++",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 0,
+      ug_total: 0,
+      pg_annual: 0,
+      pg_total: 0,
+      hostel_annual: 0
+    },
+    cutoff_general: 120,
+    cutoff_obc: 280,
+    cutoff_sc: 650,
+    cutoff_st: 950,
+    avg_package_lpa: 15.0,
+    max_package_lpa: 25.0,
+    seats: 130,
+    nirf_rank: 5,
+    website: "https://www.afmc.nic.in"
+  },
+  {
+    id: 2043,
+    name: "B.J. Medical College",
+    location: "Sassoon Road",
+    district: "Pune",
+    state: "Maharashtra",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 12500,
+      ug_total: 62500,
+      pg_annual: 18000,
+      pg_total: 54000,
+      hostel_annual: 20000
+    },
+    cutoff_general: 575,
+    cutoff_obc: 1095,
+    cutoff_sc: 2280,
+    cutoff_st: 3120,
+    avg_package_lpa: 8.5,
+    max_package_lpa: 15.8,
+    seats: 200,
+    nirf_rank: 40,
+    website: "https://www.bjmc.org"
+  },
+
+  // Karnataka - Bengaluru
+  {
+    id: 2044,
+    name: "Bangalore Medical College and Research Institute",
+    location: "Fort",
+    district: "Bengaluru Urban",
+    state: "Karnataka",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A++",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 15000,
+      ug_total: 75000,
+      pg_annual: 20000,
+      pg_total: 60000,
+      hostel_annual: 18000
+    },
+    cutoff_general: 565,
+    cutoff_obc: 1070,
+    cutoff_sc: 2230,
+    cutoff_st: 3050,
+    avg_package_lpa: 9.2,
+    max_package_lpa: 17.0,
+    seats: 250,
+    nirf_rank: 32,
+    website: "https://www.bmcri.edu.in"
+  },
+
+  // Karnataka - Mysuru
+  {
+    id: 2045,
+    name: "Mysore Medical College and Research Institute",
+    location: "Irwin Road",
+    district: "Mysuru",
+    state: "Karnataka",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS", "DM"],
+    fees_structure: {
+      ug_annual: 15000,
+      ug_total: 75000,
+      pg_annual: 20000,
+      pg_total: 60000,
+      hostel_annual: 18000
+    },
+    cutoff_general: 600,
+    cutoff_obc: 1180,
+    cutoff_sc: 2480,
+    cutoff_st: 3380,
+    avg_package_lpa: 8.0,
+    max_package_lpa: 15.0,
+    seats: 200,
+    nirf_rank: 50,
+    website: "https://www.mmcri.edu.in"
+  },
+
+  // Delhi
+  {
+    id: 2046,
+    name: "Maulana Azad Medical College",
+    location: "Bahadur Shah Zafar Marg",
+    district: "Central Delhi",
+    state: "Delhi",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A++",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 5800,
+      ug_total: 29000,
+      pg_annual: 8000,
+      pg_total: 24000,
+      hostel_annual: 12000
+    },
+    cutoff_general: 200,
+    cutoff_obc: 420,
+    cutoff_sc: 1050,
+    cutoff_st: 1450,
+    avg_package_lpa: 10.0,
+    max_package_lpa: 18.0,
+    seats: 250,
+    nirf_rank: 15,
+    website: "https://www.mamc.ac.in"
+  },
+  {
+    id: 2047,
+    name: "Lady Hardinge Medical College",
+    location: "Connaught Place",
+    district: "Central Delhi",
+    state: "Delhi",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS"],
+    fees_structure: {
+      ug_annual: 5800,
+      ug_total: 29000,
+      pg_annual: 8000,
+      pg_total: 24000,
+      hostel_annual: 12000
+    },
+    cutoff_general: 250,
+    cutoff_obc: 480,
+    cutoff_sc: 1150,
+    cutoff_st: 1550,
+    avg_package_lpa: 9.5,
+    max_package_lpa: 17.5,
+    seats: 150,
+    nirf_rank: 22,
+    website: "https://www.lhmc-hosp.gov.in"
+  },
+
+  // West Bengal - Kolkata
+  {
+    id: 2048,
+    name: "Medical College Kolkata",
+    location: "College Street",
+    district: "Kolkata",
+    state: "West Bengal",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A++",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 6500,
+      ug_total: 32500,
+      pg_annual: 9000,
+      pg_total: 27000,
+      hostel_annual: 14000
+    },
+    cutoff_general: 555,
+    cutoff_obc: 1050,
+    cutoff_sc: 2180,
+    cutoff_st: 2980,
+    avg_package_lpa: 8.8,
+    max_package_lpa: 16.5,
+    seats: 250,
+    nirf_rank: 28,
+    website: "https://www.mckolkata.org"
+  },
+
+  // Uttar Pradesh - Lucknow
+  {
+    id: 2049,
+    name: "King George's Medical University",
+    location: "Shah Mina Road",
+    district: "Lucknow",
+    state: "Uttar Pradesh",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A++",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh", "PhD"],
+    fees_structure: {
+      ug_annual: 7500,
+      ug_total: 37500,
+      pg_annual: 10000,
+      pg_total: 30000,
+      hostel_annual: 15000
+    },
+    cutoff_general: 540,
+    cutoff_obc: 1020,
+    cutoff_sc: 2120,
+    cutoff_st: 2920,
+    avg_package_lpa: 9.0,
+    max_package_lpa: 16.8,
+    seats: 250,
+    nirf_rank: 25,
+    website: "https://www.kgmu.org"
+  },
+
+  // Rajasthan - Jaipur
+  {
+    id: 2050,
+    name: "SMS Medical College",
+    location: "JLN Marg",
+    district: "Jaipur",
+    state: "Rajasthan",
+    type: "Government",
+    level: "Both",
+    naac_grade: "A+",
+    courses: ["MBBS", "MD", "MS", "DM", "MCh"],
+    fees_structure: {
+      ug_annual: 7000,
+      ug_total: 35000,
+      pg_annual: 9500,
+      pg_total: 28500,
+      hostel_annual: 14000
+    },
+    cutoff_general: 570,
+    cutoff_obc: 1080,
+    cutoff_sc: 2250,
+    cutoff_st: 3080,
+    avg_package_lpa: 8.2,
+    max_package_lpa: 15.5,
+    seats: 250,
+    nirf_rank: 44,
+    website: "https://www.smsmedicalcollege.com"
   }
 ];
 
