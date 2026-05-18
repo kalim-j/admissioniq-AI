@@ -1,14 +1,29 @@
-# Robots.txt for CollegeMatch-AI
-# Allow all search engines to crawl public content
+# Robots.txt for CollegeMatch-AI — AI College Predictor India
+# https://collegematch-ai.vercel.app
 
 User-agent: *
 Allow: /
 
-# Disallow protected routes
-Disallow: /dashboard
-Disallow: /admin
-Disallow: /profile
-Disallow: /history
+# Disallow protected/private routes
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /history/
+Disallow: /api/
+Disallow: /offline
+
+# Allow Bingbot and Googlebot full access to public pages
+User-agent: Bingbot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
 
 # Sitemap location
 Sitemap: https://collegematch-ai.vercel.app/sitemap.xml
