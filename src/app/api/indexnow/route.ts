@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-// IndexNow key — submit this to Bing Webmaster Tools
-const INDEXNOW_KEY = "collegematchai2025indexnow";
+// IndexNow key — generated from Bing Webmaster Tools
+const INDEXNOW_KEY = "eacd4a1fe1d46de1be1ddc789944aa74";
 const HOST = "collegematch-ai.vercel.app";
 
 // Public URLs to notify Bing about
@@ -21,7 +21,7 @@ export async function GET() {
     const payload = {
       host: HOST,
       key: INDEXNOW_KEY,
-      keyLocation: `https://${HOST}/${INDEXNOW_KEY}.txt`,
+      keyLocation: `https://${HOST}/eacd4a1fe1d46de1be1ddc789944aa74.txt`,
       urlList: PUBLIC_URLS,
     };
 
